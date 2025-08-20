@@ -1,0 +1,93 @@
+name: "setup"
+
+networks:
+  net:
+    driver: "bridge"
+    name: "yt2mp3_setup_net"
+
+services:
+
+  # used to pull Composer dependencies (app/vendor/)
+  composer:
+    container_name: "yt2mp3_setup_composer"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "app_image"
+      # args:
+      #   UID: 1000
+      #   GID: 1000
+      #   USERNAME: "user"
+    image: "yt2mp3/app"
+    volumes:
+    - "../../app:/var/www"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    # entrypoint: "bash"
+    entrypoint: "composer"
+    command:
+    - "install"
+
+  # used to access the Laravel installer
+  # to create a new project :
+  # docker compose run --rm laravel new app
+  laravel:
+    container_name: "yt2mp3_setup_laravel"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "laravel_image"
+    image: "yt2mp3/yt2mp3_setup_laravel"
+    volumes:
+    - "../..:/var/www"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    # entrypoint: "bash"
+    # entrypoint: "/root/.composer/vendor/laravel/installer/bin/laravel"
+
+  # used to pull NodeJS dependencies (app/node_modules/)
+  node:
+    container_name: "yt2mp3_setup_nodejs"
+    networks:
+    - "net"
+    image: "node:24.4.0"
+    working_dir: "/app"
+    volumes:
+    - "../../app:/app"
+    # entrypoint: "bash"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    command:
+    - "npm"
+    - "install"
+
+  # used to create a SSL/TLS certificate
+  # certificate_generator:
+  #   container_name: "yt2mp3_setup_certificate_generator"
+  #   networks:
+  #   - "net"
+  #   build:
+  #     context: "../"
+  #     target: "certificate_generator_image"
+  #   image: "yt2mp3/setup_certificate_generator"
+  #   # run as the user that cloned the repository (replace if necessary)
+  #   user: "1000:1000"
+  #   volumes:
+  #   - "/home/arthur/code/docker_data/BACKLARAVEL/certs:/mnt" # modify if necessary
+  #   # entrypoint: "bash"
+  #   command:
+  #   - "req"
+  #   - "-x509"
+  #   - "-nodes"
+  #   - "-days"
+  #   - "365"
+  #   - "-newkey"
+  #   - "rsa:2048"
+  #   - "-keyout"
+  #   - "/mnt/self.key"
+  #   - "-out"
+  #   - "/mnt/self.crt"
+  #   - "-subj"
+  #   - "/C=FR/ST=Dev/L=Local/O=LocalDev/OU=Dev/CN=localhost"

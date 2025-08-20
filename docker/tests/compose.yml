@@ -1,0 +1,77 @@
+name: "tests"
+
+networks:
+  net:
+    driver: "bridge"
+    name: "dbk_tests_net"
+
+volumes:
+  database:
+    name: "dbk_tests_database"
+
+services:
+
+  # used for github actions to pull NodeJS dependencies
+  nodejs:
+    container_name: "dbk_tests_nodejs"
+    networks:
+    - "net"
+    image: "node:24.4.0"
+    working_dir: "/app"
+    volumes:
+    - "../../dbk_app:/app"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    # entrypoint: "bash"
+    command:
+    - "npm"
+    - "install"
+
+  # contains the database used for the unit tests
+  database:
+    container_name: "dbk_tests_database"
+    networks:
+    - "net"
+    image: "mariadb:11.8.2"
+    volumes:
+    - "database:/var/lib/mysql" # modify if necessary
+    environment:
+      MARIADB_ROOT_PASSWORD: "123456789"
+      MARIADB_DATABASE: "daiboken_tests"
+      MARIADB_USER: "tests_user"
+      MARIADB_PASSWORD: "987654321"
+    # open the 3306 port to allow accessing the database from outside Docker
+    ports:
+    - "3306:3306"
+    healthcheck:
+      test:
+      - "CMD"
+      - "healthcheck.sh"
+      - "--connect"
+      - "--innodb_initialized"
+      start_period: "60s"
+      interval: "5s"
+      timeout: "5s"
+      retries: 12
+
+  # contains the PHP-FPM processor + Composer
+  tests:
+    container_name: "dbk_tests_app"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "app_image"
+    image: "dbk/app"
+    volumes:
+    - "../../dbk_app:/var/www"
+    depends_on:
+      database:
+        condition: "service_healthy"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    # entrypoint: "bash"
+    command:
+    - "php"
+    - "artisan"
+    - "test"

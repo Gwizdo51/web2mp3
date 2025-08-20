@@ -1,0 +1,155 @@
+name: "server"
+
+networks:
+  net:
+    driver: "bridge"
+    name: "yt2mp3_server_net"
+    # ipam:
+    #   config:
+    #   - subnet: "172.16.0.0/24"
+    #     gateway: "172.16.0.1"
+
+services:
+
+  # contains the database of the application
+  # database:
+  #   container_name: "yt2mp3_server_database"
+  #   networks:
+  #   - "net"
+  #   image: "mariadb:11.8.2"
+  #   # env_file: "../../dbk_app/.env" # useless here -> the "env_file" directive can only be used to set variables inside the running container
+  #   # solution -> hard copy the values from the .env file
+  #   volumes:
+  #   - "/home/arthur/code/docker_data/BACKLARAVEL/database:/var/lib/mysql" # modify if necessary
+  #   environment:
+  #     MARIADB_ROOT_PASSWORD: "123456789"
+  #     MARIADB_DATABASE: "daiboken"
+  #     MARIADB_USER: "app_user"
+  #     MARIADB_PASSWORD: "987654321"
+  #   # open the 3306 port to allow accessing the database from outside Docker
+  #   ports:
+  #   - "3306:3306"
+  #   healthcheck:
+  #     test:
+  #     - "CMD"
+  #     - "healthcheck.sh"
+  #     - "--connect"
+  #     - "--innodb_initialized"
+  #     start_period: "60s"
+  #     interval: "5s"
+  #     timeout: "5s"
+  #     retries: 12
+  #   # run as the user that cloned the repository (replace if necessary)
+  #   user: "1000:1000"
+  #   restart: unless-stopped
+  database:
+    container_name: "yt2mp3_server_database"
+    networks:
+    - "net"
+    image: "postgres:17.6"
+    volumes:
+    - "/home/arthur/code/docker_data/yt2mp3/database:/var/lib/postgresql/data"
+    # - "/etc/passwd:/etc/passwd:ro"
+    environment:
+      POSTGRES_PASSWORD: "123456789"
+      POSTGRES_USER: "laravel"
+    ports:
+    - "5432:5432"
+    user: "1000:1000"
+    # entrypoint: "bash"
+
+  # contains the PHP-FPM processor
+  app:
+    container_name: "yt2mp3_server_app"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "app_image"
+    image: "yt2mp3/app"
+    depends_on:
+    - "database"
+    volumes:
+    - "../../app:/var/www"
+      # database:
+      #   condition: "service_healthy"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    # restart: unless-stopped
+    # entrypoint: "bash"
+    # ports:
+    # - "8000:8000"
+    # command:
+    # - "php"
+    # - "artisan"
+    # - "serve"
+    # - "--host"
+    # - "0.0.0.0"
+
+  # used to run "npm run dev" to watch for changes in files
+  node:
+    container_name: "yt2mp3_server_nodejs"
+    networks:
+    - "net"
+    image: "node:24.4.0"
+    depends_on:
+    - "app"
+    working_dir: "/app"
+    volumes:
+    - "../../app:/app"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    ports:
+    - "5173:5173"
+    command:
+    - "npm"
+    - "run"
+    - "dev"
+    # - "build"
+    # restart: unless-stopped
+
+  # contains a supervisor instance that controls Laravel queue workers
+  # jobs:
+  #   container_name: "yt2mp3_server_jobs"
+  #   networks:
+  #   - "net"
+  #   build:
+  #     context: "../"
+  #     target: "supervisor_image"
+  #   image: "dbk/server_jobs"
+  #   volumes:
+  #   - "./queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"
+  #   - "../../app:/var/www"
+  #   depends_on:
+  #     database:
+  #       condition: "service_healthy"
+  #   environment:
+  #     # either "work" (production) or "listen" (development)
+  #     WORKER_MODE: "listen"
+  #   # run as the user that cloned the repository (replace if necessary)
+  #   user: "1000:1000"
+  #   restart: unless-stopped
+  #   # entrypoint: "bash"
+
+  # contains the NGINX web server
+  web:
+    container_name: "yt2mp3_server_web"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "nginx_image"
+    image: "yt2mp3/server_web"
+    depends_on:
+    - "app"
+    volumes:
+    # - "/home/arthur/code/docker_data/BACKLARAVEL/certs:/etc/nginx/certs" # modify if necessary
+    - "./vhost.conf:/etc/nginx/conf.d/default.conf"
+    - "../../app:/var/www"
+    ports:
+    - "80:80"
+    # - "443:443"
+    # - "5173:5173"
+    # - "jobs"
+    # restart: unless-stopped
+    # entrypoint: "bash"
