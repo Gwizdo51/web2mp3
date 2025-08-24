@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+    // https://laracasts.com/discuss/channels/vite/docker-vite-blocked-by-cors-policy
     server: {
         host: '0.0.0.0', // exposes vite dev server to the network
         port: 5173,

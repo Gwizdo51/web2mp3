@@ -49,7 +49,7 @@ services:
 
   # used to pull NodeJS dependencies (app/node_modules/)
   node:
-    container_name: "yt2mp3_setup_nodejs"
+    container_name: "yt2mp3_setup_node"
     networks:
     - "net"
     image: "node:24.4.0"

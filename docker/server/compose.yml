@@ -26,9 +26,6 @@ services:
   #     MARIADB_DATABASE: "daiboken"
   #     MARIADB_USER: "app_user"
   #     MARIADB_PASSWORD: "987654321"
-  #   # open the 3306 port to allow accessing the database from outside Docker
-  #   ports:
-  #   - "3306:3306"
   #   healthcheck:
   #     test:
   #     - "CMD"
@@ -39,6 +36,9 @@ services:
   #     interval: "5s"
   #     timeout: "5s"
   #     retries: 12
+  #   # open the 3306 port to allow accessing the database from outside Docker
+  #   ports:
+  #   - "3306:3306"
   #   # run as the user that cloned the repository (replace if necessary)
   #   user: "1000:1000"
   #   restart: unless-stopped
@@ -53,10 +53,23 @@ services:
     environment:
       POSTGRES_PASSWORD: "123456789"
       POSTGRES_USER: "laravel"
+      PGUSER: "postgres"
+    # https://stackoverflow.com/a/72175755
+    healthcheck:
+      test:
+      - "CMD-SHELL"
+      - "pg_isready"
+      - "-d"
+      - "laravel"
+      start_period: "60s"
+      interval: "5s"
+      timeout: "5s"
+      retries: 12
     ports:
     - "5432:5432"
     user: "1000:1000"
     # entrypoint: "bash"
+    # restart: unless-stopped
 
   # contains the PHP-FPM processor
   app:
@@ -68,11 +81,11 @@ services:
       target: "app_image"
     image: "yt2mp3/app"
     depends_on:
-    - "database"
+    # - "database"
+      database:
+        condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
-      # database:
-      #   condition: "service_healthy"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
     # restart: unless-stopped
@@ -88,7 +101,7 @@ services:
 
   # used to run "npm run dev" to watch for changes in files
   node:
-    container_name: "yt2mp3_server_nodejs"
+    container_name: "yt2mp3_server_node"
     networks:
     - "net"
     image: "node:24.4.0"
