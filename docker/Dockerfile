@@ -31,12 +31,17 @@ RUN rm /usr/local/bin/install-php-extensions
 # USER ${USERNAME}
 WORKDIR /var/www
 
-# # queue workers image
-# FROM app_image AS supervisor_image
-# # install supervisor
-# RUN apt-get install -y supervisor
-# # run supervisor in the foreground
-# CMD ["supervisord", "-nc", "/etc/supervisor/conf.d/queue_worker.conf"]
+# queue workers + yt-dlp image
+FROM app_image AS supervisor_image
+# install supervisor and ffmpeg
+RUN apt-get update
+RUN apt-get install -y supervisor ffmpeg
+# install yt-dlp
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp
+# allow anyone to run yt-dlp
+RUN chmod a+x /usr/local/bin/yt-dlp
+# run supervisor in the foreground
+CMD ["supervisord", "-nc", "/etc/supervisor/conf.d/queue_worker.conf"]
 
 FROM app_image AS laravel_image
 # ARG USERNAME

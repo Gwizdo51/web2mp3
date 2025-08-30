@@ -10,7 +10,7 @@ The architecture you've outlined is a classic full-stack web application model, 
 ### The Workflow
 **Front-End User Interface (Vue.js)**:
 
-- You would create a Vue component that contains a form. This form would have an input field for the YouTube URL, and elements like dropdowns or checkboxes for the options (e.g., file type like mp3, m4a, quality).
+- You would create a Vue component that contains a form. This form would have an input field for the YouTube URL, and elements like dropdowns or checkboxes for the options (e.g., file type like mp3, m4a, quality) -> save the options selected to the cookies of the user, so that they can be loaded on his next visit without overloading the server with session data.
 
 - When the user clicks the "DOWNLOAD" button, a JavaScript function is triggered. This function prevents the default form submission and sends an axios POST request to your Laravel back end, sending the URL and selected options in the request body.
 
@@ -45,6 +45,8 @@ Immediately After Download: When the user's browser automatically starts the dow
 
 Scheduled Task: For files that might not be downloaded immediately, a more robust solution is to use Laravel's Task Scheduler. You can create a command that runs periodically (e.g., once an hour) and deletes any files in your temporary downloads directory that are older than a certain age (e.g., 30 minutes or 1 hour). This handles cases where a user might leave the page before the download completes.
 
+Queued jobs: After the file is created on the server, you can launch a delayed job to delete this specific file after a certain amount of time passed (5 minutes).
+
 2. **How can the backend notify the frontend that the download completed**?
 
 Your intuition is correct: WebSockets are the ideal solution here. They provide a persistent, two-way communication channel between the client and the server, allowing the server to push real-time updates to the browser without the browser having to constantly ask for them.
@@ -64,6 +66,24 @@ The Process:
 - The front end receives this event, updates the UI, and triggers the download.
 
 While you could use polling (where the front end repeatedly sends requests to the server to ask for the job status), this is inefficient and resource-intensive for both the client and the server. WebSockets are the modern, more efficient approach for real-time applications like this.
+
+# yt-dlp options
+
+- output file path : `-o "/var/www/storage/app/public/%(title)s.%(ext)s"`
+- extract audio : `-x`
+- format selection : `-f bestaudio`
+- audio format (`aac`, `alac`, `flac`, `m4a`, `mp3`, `opus`, `vorbis`, `wav`) : `--audio-format mp3`
+- audio quality : `--audio-quality 0`
+- disable caching : `--no-cache-dir`
+
+Example : `yt-dlp -x -f bestaudio --audio-format mp3 --audio-quality 0 -o "/var/www/storage/app/public/%(title)s.%(ext)s" --no-cache-dir 'https://www.youtube.com/watch?v=wl95CZVD5m8'`
+
+# Potential TailwindCSS component libraries
+
+- https://flowbite.com/
+- https://www.material-tailwind.com/
+- https://preline.co/
+- https://daisyui.com/
 
 # DUMP
 

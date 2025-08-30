@@ -49,18 +49,13 @@ services:
     image: "postgres:17.6"
     volumes:
     - "/home/arthur/code/docker_data/yt2mp3/database:/var/lib/postgresql/data"
-    # - "/etc/passwd:/etc/passwd:ro"
     environment:
       POSTGRES_PASSWORD: "123456789"
       POSTGRES_USER: "laravel"
-      PGUSER: "postgres"
-    # https://stackoverflow.com/a/72175755
     healthcheck:
       test:
       - "CMD-SHELL"
-      - "pg_isready"
-      - "-d"
-      - "laravel"
+      - "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_USER"
       start_period: "60s"
       interval: "5s"
       timeout: "5s"
@@ -99,6 +94,29 @@ services:
     # - "--host"
     # - "0.0.0.0"
 
+  # contains a supervisor instance that controls Laravel queue workers
+  jobs:
+    container_name: "yt2mp3_server_jobs"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "supervisor_image"
+    image: "yt2mp3/server_jobs"
+    volumes:
+    - "./queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"
+    - "../../app:/var/www"
+    depends_on:
+      database:
+        condition: "service_healthy"
+    environment:
+      # either "work" (production) or "listen" (development)
+      WORKER_MODE: "listen"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    # restart: unless-stopped
+    # entrypoint: "bash"
+
   # used to run "npm run dev" to watch for changes in files
   node:
     container_name: "yt2mp3_server_node"
@@ -107,6 +125,7 @@ services:
     image: "node:24.4.0"
     depends_on:
     - "app"
+    - "jobs"
     working_dir: "/app"
     volumes:
     - "../../app:/app"
@@ -121,29 +140,6 @@ services:
     # - "build"
     # restart: unless-stopped
 
-  # contains a supervisor instance that controls Laravel queue workers
-  # jobs:
-  #   container_name: "yt2mp3_server_jobs"
-  #   networks:
-  #   - "net"
-  #   build:
-  #     context: "../"
-  #     target: "supervisor_image"
-  #   image: "dbk/server_jobs"
-  #   volumes:
-  #   - "./queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"
-  #   - "../../app:/var/www"
-  #   depends_on:
-  #     database:
-  #       condition: "service_healthy"
-  #   environment:
-  #     # either "work" (production) or "listen" (development)
-  #     WORKER_MODE: "listen"
-  #   # run as the user that cloned the repository (replace if necessary)
-  #   user: "1000:1000"
-  #   restart: unless-stopped
-  #   # entrypoint: "bash"
-
   # contains the NGINX web server
   web:
     container_name: "yt2mp3_server_web"
@@ -155,6 +151,7 @@ services:
     image: "yt2mp3/server_web"
     depends_on:
     - "app"
+    - "jobs"
     volumes:
     # - "/home/arthur/code/docker_data/BACKLARAVEL/certs:/etc/nginx/certs" # modify if necessary
     - "./vhost.conf:/etc/nginx/conf.d/default.conf"
@@ -163,6 +160,5 @@ services:
     - "80:80"
     # - "443:443"
     # - "5173:5173"
-    # - "jobs"
     # restart: unless-stopped
     # entrypoint: "bash"

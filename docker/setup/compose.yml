@@ -39,7 +39,7 @@ services:
     build:
       context: "../"
       target: "laravel_image"
-    image: "yt2mp3/yt2mp3_setup_laravel"
+    image: "yt2mp3/setup_laravel"
     volumes:
     - "../..:/var/www"
     # run as the user that cloned the repository (replace if necessary)
