@@ -123,9 +123,9 @@ services:
     networks:
     - "net"
     image: "node:24.4.0"
-    depends_on:
-    - "app"
-    - "jobs"
+    # depends_on:
+    # - "app"
+    # - "jobs"
     working_dir: "/app"
     volumes:
     - "../../app:/app"
