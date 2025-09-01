@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use App\Models\Download;
+
 
 class MainController extends Controller {
 
@@ -20,6 +22,13 @@ class MainController extends Controller {
         ]);
         // check if the URL is a valid YouTube video URL
         // ...
+        // add the download to the database
+        Download::create([
+            'youtube_url' => $validated['link'],
+            'format' => $validated['format'],
+            'quality' => $validated['quality'],
+            'state_id' => 1
+        ]);
         return Inertia::render('Test', [
             'link' => $validated['link'],
             'format' => $validated['format'],

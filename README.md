@@ -85,6 +85,21 @@ Example : `yt-dlp -x -f bestaudio --audio-format mp3 --audio-quality 0 -o "/var/
 - https://preline.co/
 - https://daisyui.com/
 
+# MCD (mocodo)
+
+```
+DOWNLOADS: id download, youtube url, format, quality, file name
+STATES: id state, label
+
+DESCRIBE, 11 DOWNLOADS, 0N STATES
+```
+
+Possible states :
+- Waiting
+- Running
+- Failed
+- Succeeded
+
 # DUMP
 
 ### PostgreSQL
