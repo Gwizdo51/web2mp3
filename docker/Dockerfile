@@ -20,7 +20,7 @@ FROM php:8.4-fpm AS app_image
 # https://github.com/mlocati/docker-php-extension-installer
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 # RUN install-php-extensions @composer intl bcmath pdo_mysql zip
-RUN install-php-extensions @composer pdo_pgsql
+RUN install-php-extensions @composer pdo_pgsql pcntl
 RUN rm /usr/local/bin/install-php-extensions
 # install ca-certificates to enable sending HTTPS requests to the windows server
 # RUN apt-get update

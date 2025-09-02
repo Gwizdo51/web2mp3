@@ -7,6 +7,7 @@ const props = defineProps<{
 console.log(props);
 </script>
 
+
 <template>
 {{ props.link }}<br />{{ props.format }}<br />{{ props.quality }}
 </template>

@@ -117,6 +117,27 @@ services:
     # restart: unless-stopped
     # entrypoint: "bash"
 
+  reverb:
+    container_name: "yt2mp3_server_reverb"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "app_image"
+    image: "yt2mp3/app"
+    depends_on:
+      database:
+        condition: "service_healthy"
+    volumes:
+    - "../../app:/var/www"
+    # ports:
+    # - "9001:9001"
+    command:
+    - "php"
+    - "artisan"
+    - "reverb:start"
+    - "--debug"
+
   # used to run "npm run dev" to watch for changes in files
   node:
     container_name: "yt2mp3_server_node"
@@ -152,6 +173,7 @@ services:
     depends_on:
     - "app"
     - "jobs"
+    - "reverb"
     volumes:
     # - "/home/arthur/code/docker_data/BACKLARAVEL/certs:/etc/nginx/certs" # modify if necessary
     - "./vhost.conf:/etc/nginx/conf.d/default.conf"
@@ -160,5 +182,6 @@ services:
     - "80:80"
     # - "443:443"
     # - "5173:5173"
+    - "9001:9001"
     # restart: unless-stopped
     # entrypoint: "bash"

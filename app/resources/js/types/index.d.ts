@@ -36,3 +36,9 @@ export interface User {
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
+
+// ---
+
+export type WSMessage = {
+    success: boolean;
+};

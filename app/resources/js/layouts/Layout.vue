@@ -6,6 +6,7 @@ defineProps<{
 }>();
 </script>
 
+
 <template>
     <Head :title="title" />
     <!-- bg-[#141719] -->

@@ -11,7 +11,7 @@ use App\Models\Download;
 class MainController extends Controller {
 
     public function getLandingPage() {
-        return Inertia::render('Landing');
+        return Inertia::render('App');
     }
 
     public function newDownloadRequest(Request $request) {
