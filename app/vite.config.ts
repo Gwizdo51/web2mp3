@@ -10,11 +10,13 @@ export default defineConfig({
         port: 5173,
         strictPort: true, // vite should fail if the 5173 port is not available
         cors: {
-            origin: 'http://100.100.151.68', // the IP address of the server
+            // origin: 'http://100.100.151.68', // the IP address of the server
+            origin: 'http://www.yt2mp3.100.100.151.68.nip.io', // the IP address of the server
             credentials: true,
         },
         hmr: {
-            host: '100.100.151.68' // the IP address of the server
+            // host: '100.100.151.68' // the IP address of the server
+            host: 'www.yt2mp3.100.100.151.68.nip.io' // the IP address of the server
         }
     },
     plugins: [

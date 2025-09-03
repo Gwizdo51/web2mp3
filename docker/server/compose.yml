@@ -182,6 +182,6 @@ services:
     - "80:80"
     # - "443:443"
     # - "5173:5173"
-    - "9001:9001"
+    # - "9001:9001"
     # restart: unless-stopped
     # entrypoint: "bash"
