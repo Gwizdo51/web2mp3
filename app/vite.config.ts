@@ -14,6 +14,7 @@ export default defineConfig({
         cors: {
             // origin: 'http://100.100.151.68', // the IP address of the server
             origin: 'https://yt2mp3.100.100.151.68.nip.io', // the IP address of the server
+            // origin: 'https://yt2mp3.100.100.151.68.nip.io:5000', // the IP address of the server
             credentials: true,
         },
         hmr: {

@@ -14,15 +14,15 @@ use Illuminate\Queue\SerializesModels;
 class LinkProcessed implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    protected string $channelName;
+    protected string $DownloadID;
     public bool $success;
     public ?string $fileName;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $channelName, bool $success, ?string $fileName = null) {
-        $this->channelName = $channelName;
+    public function __construct(string $DownloadID, bool $success, ?string $fileName = null) {
+        $this->DownloadID = $DownloadID;
         $this->success = $success;
         $this->fileName = $fileName;
     }
@@ -34,7 +34,7 @@ class LinkProcessed implements ShouldBroadcastNow {
      */
     public function broadcastOn(): array {
         return [
-            new Channel($this->channelName),
+            new Channel($this->DownloadID),
         ];
     }
 }

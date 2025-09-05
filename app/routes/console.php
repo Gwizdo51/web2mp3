@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Process;
 
 use App\Events\LinkProcessed;
 
@@ -14,3 +16,17 @@ Artisan::command('inspire', function () {
 //     LinkProcessed::dispatch('channel-name', true);
 //     $this->comment('Event "LinkProcessed" dispatched');
 // })->purpose('Test reverb event broadcast');
+
+Artisan::command('printURL', function () {
+    $this->comment(Storage::url('V.I.C.A.R.I. - Pascià - Original Mix (Robsoul).mp3'));
+});
+
+Artisan::command('listFiles', function () {
+    $result = Process::run('ls ./storage/app/public');
+    $this->comment($result->output());
+});
+
+Artisan::command('rmDir', function () {
+    $result = Process::run('rm -r ./storage/app/public/dir');
+    $this->comment($result->output());
+});

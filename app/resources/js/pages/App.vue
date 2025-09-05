@@ -6,6 +6,12 @@ import Processing from "@/components/my_components/Processing.vue";
 import Result from "@/components/my_components/Result.vue";
 import { ResultData } from '@/types';
 
+interface SubmitApiResponseData {
+    id: string;
+    state: number;
+    fileName: Nullable<string>;
+}
+
 // static data
 const tabTitles: string[] = [
     "Landing",
@@ -18,10 +24,10 @@ const tabIndex = ref<number>(0);
 const tabTitle = computed<string>(() => tabTitles[tabIndex.value]);
 const inputLink = ref<string>("");
 const inputFormat = ref<string>("mp3");
-const inputQuality = ref<number>(10);
+const inputQuality = ref<number>(0);
 const linkError = ref<string>("");
 const formProcessing = ref<boolean>(false);
-const downloadID = ref<string>("");
+const downloadId = ref<string>("");
 const success = ref<boolean>(true);
 const fileName = ref<string>("");
 
@@ -57,13 +63,7 @@ async function submitForm(): Promise<void> {
     if (response.ok) {
         const jsonResponse = await response.json();
         console.log("/api/submit/ response :", jsonResponse);
-        // reset the link input field
-        linkError.value = "";
-        inputLink.value = "";
-        // update the props for the "Processing" component
-        downloadID.value = jsonResponse.data.channelName;
-        // display the "Processing" component
-        tabIndex.value = 1;
+        processResponse(jsonResponse.data);
     }
     else if (response.status === 422) {
         const jsonResponse = await response.json();
@@ -77,6 +77,33 @@ async function submitForm(): Promise<void> {
     }
 }
 
+function processResponse(jsonResponse: SubmitApiResponseData) {
+    // reset the link input field
+    linkError.value = "";
+    inputLink.value = "";
+    if (jsonResponse.state <= 2) {
+        // update the props for the "Processing" component
+        downloadId.value = jsonResponse.id;
+        // display it
+        tabIndex.value = 1;
+    }
+    else if (jsonResponse.state === 3) {
+        // update the props for the "Result" component
+        downloadId.value = jsonResponse.id;
+        success.value = true;
+        fileName.value = jsonResponse.fileName as string;
+        // display it
+        tabIndex.value = 2;
+    }
+    else {
+        // update the props for the "Result component"
+        downloadId.value = jsonResponse.id;
+        success.value = false;
+        // display it
+        tabIndex.value = 2;
+    }
+}
+
 function onLinkProcessed(data: ResultData) {
     console.log("LinkProcessed data :", data);
     // downloadID.value = "";
@@ -87,7 +114,7 @@ function onLinkProcessed(data: ResultData) {
 
 function onReturn() {
     tabIndex.value = 0;
-    downloadID.value = "";
+    downloadId.value = "";
     fileName.value = "";
 }
 </script>
@@ -97,7 +124,7 @@ function onReturn() {
     <Layout :title="tabTitle">
         <Form v-if="tabIndex === 0" v-model:input-link="inputLink" v-model:input-format="inputFormat" v-model:input-quality="inputQuality"
         :link-error="linkError" :processing="formProcessing" @submit="submitForm" />
-        <Processing v-else-if="tabIndex === 1" :download-id="downloadID" @link-processed="onLinkProcessed" />
-        <Result v-else-if="tabIndex === 2" :success="success" :file-name="fileName" @return="onReturn" />
+        <Processing v-else-if="tabIndex === 1" :download-id="downloadId" @link-processed="onLinkProcessed" />
+        <Result v-else-if="tabIndex === 2" :success="success" :download-id="downloadId" :file-name="fileName" @return="onReturn" />
     </Layout>
 </template>

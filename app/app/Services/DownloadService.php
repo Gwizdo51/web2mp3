@@ -5,18 +5,21 @@ namespace App\Services;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Process;
 use DomainException;
 
 use App\Models\Download;
 use App\Jobs\ConvertVideoToAudio;
 use App\Jobs\BroadcastQueueUpdate;
+use App\Jobs\DeleteExpiredFile;
 use App\Events\LinkProcessed;
 use App\Events\QueueUpdated;
 
 
 class DownloadService {
 
-    public static function processForm(string $link, string $format, int $quality): Download {
+    public static function processForm(string $link, string $format, int $quality): array {
         Log::debug('processForm - called');
         Log::debug("processForm - link : {$link}");
         Log::debug("processForm - format : {$format}");
@@ -25,23 +28,45 @@ class DownloadService {
         $normalizedLink = self::normalizeLink($link);
         Log::debug("processForm - normalized link : {$normalizedLink}");
         // check if a download with the same parameters already exists
-        // ...
-        // save the download parameters in the database
-        $download = Download::create([
-            'youtube_url' => $normalizedLink,
-            'format' => $format,
-            'quality' => $quality,
-            'state_id' => 1
-        ]);
-        // start the processing job
-        // https://laracasts.com/discuss/channels/laravel/get-job-id-from-dispatch-in-controller
-        $jobId = Queue::push(new ConvertVideoToAudio($download), queue: 'downloads');
-        Log::debug("processForm - new job ID : {$jobId}");
-        // add the job id to the download model
-        $download->update([
-            'job_id' => $jobId,
-        ]);
-        return $download;
+        $sameDownload = Download::where('youtube_url', $normalizedLink)
+            ->where('format', $format)
+            ->where('quality', $quality)
+            ->where('state_id', '<>', 4)
+            ->first();
+        Log::debug('$sameDownload :');
+        Log::debug($sameDownload);
+        if ($sameDownload === null) {
+            // save the download parameters in the database
+            $download = Download::create([
+                'youtube_url' => $normalizedLink,
+                'format' => $format,
+                'quality' => $quality,
+                'state_id' => 1
+            ]);
+            // start the processing job
+            // https://laracasts.com/discuss/channels/laravel/get-job-id-from-dispatch-in-controller
+            $jobId = Queue::push(new ConvertVideoToAudio($download), queue: 'downloads');
+            Log::debug("processForm - new job ID : {$jobId}");
+            // add the job id to the download model
+            $download->update([
+                'job_id' => $jobId,
+            ]);
+            // return the new download
+            $jsonResponseData = [
+                'id' => $download->id,
+                'state' => $download->state_id,
+                'fileName' => $download->file_name,
+            ];
+        }
+        else {
+            // return the download that was found
+            $jsonResponseData = [
+                'id' => $sameDownload->id,
+                'state' => $sameDownload->state_id,
+                'fileName' => $sameDownload->file_name,
+            ];
+        }
+        return $jsonResponseData;
     }
 
     protected static function normalizeLink(string $link): string {
@@ -90,17 +115,47 @@ class DownloadService {
         Log::debug('handleConvertVideoToAudio - broadcasting queue update');
         Queue::push(new BroadcastQueueUpdate());
         Log::debug('handleConvertVideoToAudio - processing download');
+        // make the directory that will contain the file
+        Storage::makeDirectory($download->id);
         // launch the yt-dlp process
-        // ...
-        sleep(10);
-        Log::debug('handleConvertVideoToAudio - processing completed successfully');
-        $download->update([
-            'state_id' => 3,
-            'file_name' => 'blbl.lele',
-        ]);
-        // broadcast the LinkProcessed event
-        Log::debug('handleConvertVideoToAudio - broadcasting "LinkProcessed" event');
-        LinkProcessed::dispatch($download->id, true, 'blbl.lele');
+        // sleep(10);
+        // Process::run("touch ./storage/app/public/{$download->id}/prout");
+        $ytdlpProcessString = "yt-dlp -x -f bestaudio --audio-format mp3 --audio-quality {$download->quality}"
+            ." -o \"/var/www/storage/app/public/{$download->id}/%(title)s.%(ext)s\" --no-cache-dir '{$download->youtube_url}'";
+        Log::debug('yt-dlp process string :');
+        Log::debug($ytdlpProcessString);
+        $processResult = Process::timeout(300)->run($ytdlpProcessString);
+        Log::debug('yt-dlp standard output :');
+        Log::debug(trim($processResult->output()));
+        Log::debug('yt-dlp error output :');
+        Log::debug(trim($processResult->errorOutput()));
+        if ($processResult->successful()) {
+            Log::debug('handleConvertVideoToAudio - processing completed successfully');
+            // get the name of the file that was created
+            $processResult = Process::run("ls ./storage/app/public/{$download->id}");
+            $fileName = trim($processResult->output());
+            $download->update([
+                'state_id' => 3,
+                'file_name' => $fileName,
+            ]);
+            // broadcast the LinkProcessed event
+            Log::debug('handleConvertVideoToAudio - broadcasting "LinkProcessed" event');
+            LinkProcessed::dispatch($download->id, true, $fileName);
+            // dispatch the deletion job for the newly downloaded file
+            Log::debug('handleConvertVideoToAudio - queueing file deletion job');
+            DeleteExpiredFile::dispatch($download)->delay(60*60);
+        }
+        else {
+            Log::debug('handleConvertVideoToAudio - processing failed');
+            $download->update([
+                'state_id' => 4,
+            ]);
+            // broadcast the LinkProcessed event
+            Log::debug('handleConvertVideoToAudio - broadcasting "LinkProcessed" event');
+            LinkProcessed::dispatch($download->id, false);
+            // delete the folder that was just created
+            Storage::deleteDirectory($download->id);
+        }
     }
 
     public static function handleBroadcastQueueUpdate(): void {
@@ -111,6 +166,15 @@ class DownloadService {
         foreach ($pendingDownloads as $pendingDownload) {
             QueueUpdated::dispatch($pendingDownload->id, self::getQueuePosition($pendingDownload));
         }
+    }
+
+    public static function handleDeleteFile(Download $download): void {
+        Log::debug('handleDeleteFile - called');
+        Log::debug("handleDeleteFile - deleting \"/storage/{$download->id}/{$download->file_name}\"");
+        // delete the file
+        Storage::deleteDirectory($download->id);
+        // soft delete the download model
+        $download->delete();
     }
 
 }

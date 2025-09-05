@@ -6,10 +6,10 @@ import { CircleAlert, LoaderCircle } from 'lucide-vue-next';
 // static data
 const formats = ["mp3", "m4a", "flac", "wav", "aac", "alac", "opus", "vorbis"];
 const qualities = [
-    {name: "best", value: 10},
-    {name: "good", value: 8},
-    {name: "average", value: 6},
-    {name: "poor", value: 4}
+    {name: "best", value: 0},
+    {name: "good", value: 2},
+    {name: "average", value: 4},
+    {name: "poor", value: 6}
 ];
 
 // props

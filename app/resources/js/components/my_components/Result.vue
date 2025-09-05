@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import { Check, X, Download } from 'lucide-vue-next';
+import { onMounted } from 'vue';
 
 // props
-const {success, fileName} = defineProps<{
+const {success, downloadId, fileName} = defineProps<{
     success: boolean;
+    downloadId: string;
     fileName: string;
 }>();
+
+const fileUrl = `/storage/${downloadId}/${fileName}`;
+
+onMounted(() => {
+    if (success) {
+        // download the file automatically
+        (document.getElementById("downloadButton") as HTMLAnchorElement).click();
+    }
+});
 
 // emits
 defineEmits<{
@@ -25,10 +36,12 @@ defineEmits<{
             <p class="text-xl pt-20">Something went wrong ...</p>
         </div>
         <div class="flex flex-col items-center gap-3">
-            <button class="flex items-center gap-2 bg-green-600 rounded-full py-2 px-5 text-2xl hover:bg-green-700 active:bg-green-800 transition-all ease-out duration-100 disabled:bg-green-950 disabled:text-zinc-500" :disabled="!success">
+            <a id="downloadButton" class="flex items-center gap-2 bg-green-600 rounded-full py-2 px-5 text-2xl hover:bg-green-700 active:bg-green-800
+            transition-all ease-out duration-100 disabled:bg-green-950 disabled:text-zinc-500 cursor-default select-none"
+            :disabled="!success" :href="fileUrl" :download="fileName">
                 <Download class="w-6 h-6" />
                 Download
-            </button>
+            </a>
             <p class="text-zinc-500">The download should start automatically</p>
         </div>
         <div class="text-center">

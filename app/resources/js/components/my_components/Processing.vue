@@ -4,7 +4,7 @@ import { useEchoPublic } from "@laravel/echo-vue";
 import { QueueUpdatedMessage, ResultData } from '@/types';
 import { ref, onMounted } from 'vue';
 
-interface ApiResponseData {
+interface StatusApiResponseData {
     fileName: Nullable<string>;
     queuePosition: number;
     state: number;
@@ -72,7 +72,7 @@ onMounted(async () => {
     }
 });
 
-function processApiResponse(jsonResponseData: ApiResponseData) {
+function processApiResponse(jsonResponseData: StatusApiResponseData) {
     switch (jsonResponseData.state) {
         case 1: // waiting
             displayedText.value = `Download queued (position: ${jsonResponseData.queuePosition}) ...`;

@@ -24,7 +24,7 @@ class MainController extends Controller {
         Log::debug('newDownloadRequest - called');
         $validated = $request->validated();
         // process the form
-        $download = DownloadService::processForm(
+        $downloadData = DownloadService::processForm(
             $validated['link'],
             $validated['format'],
             $validated['quality'],
@@ -37,9 +37,7 @@ class MainController extends Controller {
         return response()->json([
             'success' => true,
             'message' => 'Download process queued',
-            'data' => [
-                'channelName' => $download->id,
-            ],
+            'data' => $downloadData,
             'errors' => [],
         ]);
     }

@@ -14,14 +14,14 @@ use Illuminate\Queue\SerializesModels;
 class QueueUpdated implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    protected string $channelName;
+    protected string $DownloadID;
     public int $queuePosition;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $channelName, int $queuePosition) {
-        $this->channelName = $channelName;
+    public function __construct(string $DownloadID, int $queuePosition) {
+        $this->DownloadID = $DownloadID;
         $this->queuePosition = $queuePosition;
     }
 
@@ -32,7 +32,7 @@ class QueueUpdated implements ShouldBroadcastNow {
      */
     public function broadcastOn(): array {
         return [
-            new Channel($this->channelName),
+            new Channel($this->DownloadID),
         ];
     }
 }

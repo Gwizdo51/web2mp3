@@ -188,7 +188,6 @@ services:
     ports:
     - "80:80"
     - "443:443"
-    # - "5173:5173"
-    # - "9001:9001"
+    # - "5000:5000"
     # restart: unless-stopped
     # entrypoint: "bash"
