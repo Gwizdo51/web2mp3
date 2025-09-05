@@ -22,7 +22,6 @@ class DownloadRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            // 'link' => 'required|url',
             'link' => 'required|string',
             'format' => 'required|string|in:mp3,m4a,flac,wav,aac,alac,opus,vorbis',
             'quality' => 'required|integer|min:0|max:10',

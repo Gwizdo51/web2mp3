@@ -64,30 +64,30 @@ services:
     - "install"
 
   # used to create a SSL/TLS certificate
-  # certificate_generator:
-  #   container_name: "yt2mp3_setup_certificate_generator"
-  #   networks:
-  #   - "net"
-  #   build:
-  #     context: "../"
-  #     target: "certificate_generator_image"
-  #   image: "yt2mp3/setup_certificate_generator"
-  #   # run as the user that cloned the repository (replace if necessary)
-  #   user: "1000:1000"
-  #   volumes:
-  #   - "/home/arthur/code/docker_data/BACKLARAVEL/certs:/mnt" # modify if necessary
-  #   # entrypoint: "bash"
-  #   command:
-  #   - "req"
-  #   - "-x509"
-  #   - "-nodes"
-  #   - "-days"
-  #   - "365"
-  #   - "-newkey"
-  #   - "rsa:2048"
-  #   - "-keyout"
-  #   - "/mnt/self.key"
-  #   - "-out"
-  #   - "/mnt/self.crt"
-  #   - "-subj"
-  #   - "/C=FR/ST=Dev/L=Local/O=LocalDev/OU=Dev/CN=localhost"
+  certificate_generator:
+    container_name: "yt2mp3_setup_certificate_generator"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "certificate_generator_image"
+    image: "yt2mp3/setup_certificate_generator"
+    # run as the user that cloned the repository (replace if necessary)
+    user: "1000:1000"
+    volumes:
+    - "/home/arthur/code/docker_data/yt2mp3/certs:/mnt" # modify if necessary
+    # entrypoint: "bash"
+    command:
+    - "req"
+    - "-x509"
+    - "-nodes"
+    - "-days"
+    - "365"
+    - "-newkey"
+    - "rsa:2048"
+    - "-keyout"
+    - "/mnt/self.key"
+    - "-out"
+    - "/mnt/self.crt"
+    - "-subj"
+    - "/C=FR/ST=Dev/L=Local/O=LocalDev/OU=Dev/CN=yt2mp3.100.100.151.68.nip.io"

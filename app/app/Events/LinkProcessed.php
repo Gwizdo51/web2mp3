@@ -15,8 +15,8 @@ class LinkProcessed implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected string $channelName;
-    protected bool $success;
-    protected ?string $fileName;
+    public bool $success;
+    public ?string $fileName;
 
     /**
      * Create a new event instance.
@@ -35,18 +35,6 @@ class LinkProcessed implements ShouldBroadcastNow {
     public function broadcastOn(): array {
         return [
             new Channel($this->channelName),
-        ];
-    }
-
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array<string, mixed>
-     */
-    public function broadcastWith(): array {
-        return [
-            'success' => $this->success,
-            'fileName' => $this->fileName,
         ];
     }
 }
