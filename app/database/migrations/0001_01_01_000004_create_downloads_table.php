@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->unsignedTinyInteger('quality');
             $table->string('file_name', 255)->nullable();
             $table->foreignId('state_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('job_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

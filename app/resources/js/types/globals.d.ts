@@ -24,3 +24,10 @@ declare module 'vue' {
         $headManager: ReturnType<typeof createHeadManager>;
     }
 }
+
+// global types
+// https://www.reddit.com/r/typescript/comments/1crnuvm/how_can_i_have_typesinterfaces_globally_and_use/
+declare global {
+    // https://stackoverflow.com/a/53453116
+    type Nullable<T> = T | null;
+}

@@ -11,20 +11,18 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 
-class LinkProcessed implements ShouldBroadcastNow {
+class QueueUpdated implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected string $channelName;
-    protected bool $success;
-    protected ?string $fileName;
+    public int $queuePosition;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $channelName, bool $success, ?string $fileName = null) {
+    public function __construct(string $channelName, int $queuePosition) {
         $this->channelName = $channelName;
-        $this->success = $success;
-        $this->fileName = $fileName;
+        $this->queuePosition = $queuePosition;
     }
 
     /**
@@ -35,18 +33,6 @@ class LinkProcessed implements ShouldBroadcastNow {
     public function broadcastOn(): array {
         return [
             new Channel($this->channelName),
-        ];
-    }
-
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array<string, mixed>
-     */
-    public function broadcastWith(): array {
-        return [
-            'success' => $this->success,
-            'fileName' => $this->fileName,
         ];
     }
 }

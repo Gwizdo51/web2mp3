@@ -39,6 +39,14 @@ export type BreadcrumbItemType = BreadcrumbItem;
 
 // ---
 
-export type WSMessage = {
+export interface ResultData {
     success: boolean;
-};
+    fileName: Nullable<string>;
+}
+
+export interface QueueUpdatedMessage {
+    queuePosition: number;
+}
+
+// https://stackoverflow.com/a/70995964
+// export type FormElements<U extends string> = HTMLFormControlsCollection & Record<U, HTMLInputElement | RadioNodeList>

@@ -136,7 +136,7 @@ services:
     - "php"
     - "artisan"
     - "reverb:start"
-    - "--debug"
+    # - "--debug"
 
   # used to run "npm run dev" to watch for changes in files
   node:

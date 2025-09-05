@@ -12,7 +12,7 @@ use App\Http\Controllers\MainController;
 Route::get('/', [MainController::class, 'getLandingPage'])
     ->name('home');
 
-Route::post('/', [MainController::class, 'newDownloadRequest']);
+// Route::post('/', [MainController::class, 'newDownloadRequest']);
 
 // Route::get('/test', function () {
 //     return Inertia::render('Test', ['data' => [

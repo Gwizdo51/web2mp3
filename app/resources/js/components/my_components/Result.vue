@@ -2,9 +2,9 @@
 import { Check, X, Download } from 'lucide-vue-next';
 
 // props
-const {success, fileName = "XXX.xxx"} = defineProps<{
+const {success, fileName} = defineProps<{
     success: boolean;
-    fileName?: string;
+    fileName: string;
 }>();
 
 // emits
