@@ -104,6 +104,8 @@ Possible states :
 
 ### PostgreSQL
 
+#### Setup
+
 - Install and setup PostgreSQL :
     ```bash
     sudo apt update
@@ -139,3 +141,7 @@ Possible states :
     DB_USERNAME=laravel_user
     DB_PASSWORD=123456789
     ```
+
+#### Commands
+
+- Convert timestamp to date : `to_timestamp(j.created_at)`

@@ -42,6 +42,7 @@ export type BreadcrumbItemType = BreadcrumbItem;
 export interface ResultData {
     success: boolean;
     fileName: Nullable<string>;
+    error: Nullable<string>;
 }
 
 export interface QueueUpdatedMessage {

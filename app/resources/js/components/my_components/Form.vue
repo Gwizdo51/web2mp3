@@ -38,7 +38,7 @@ defineEmits<{
         <!-- <Form method="post" class="flex flex-col place-content-evenly" v-slot="{ errors, processing }"> -->
         <form @submit.prevent="$emit('submit')" class="flex flex-col place-content-evenly">
             <div class="relative flex flex-col items-center">
-                <label for="inputLink" class="text-xl text-zinc-400 mb-1">YouTube link</label>
+                <label for="inputLink" class="text-xl text-zinc-400 mb-1">Link</label>
                 <input id="inputLink" type="text" class="border-b-2 border-zinc-700 w-160 outline-none focus:border-red-800 text-center placeholder:text-zinc-700 hover:border-red-800/50 transition-all ease-out duration-200"
                 name="link" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ" required v-model="inputLink">
                 <div v-if="linkError" class="absolute flex items-center gap-1 text-sm text-red-500 -bottom-6">
@@ -50,13 +50,10 @@ defineEmits<{
                 <h3 class="text-xl text-zinc-400 mb-1">Audio format</h3>
                 <div class="grid grid-cols-4">
                     <template v-for="(format, index) in formats">
-                        <div class="flex justify-center has-checked:bg-red-800/70 hover:bg-red-800/30 transition-all ease-out duration-100">
-                            <label :for="'format_' + format" class="w-40 py-3 text-center">
-                                {{ format.toUpperCase() }}
-                            </label>
-                            <!-- <input type="radio" name="format" :id="'format_' + format" :checked="index === 0" :value="format" class="hidden"> -->
-                            <input type="radio" name="format" :id="'format_' + format" :value="format" class="hidden" v-model="inputFormat">
-                        </div>
+                        <label :for="'format_' + format" class="w-40 py-3 text-center has-checked:bg-red-800/70 hover:bg-red-800/30 cursor-pointer has-checked:cursor-default transition-all ease-out duration-100">
+                            {{ format.toUpperCase() }}
+                            <input type="radio" name="format" :id="'format_' + format" :value="format" hidden v-model="inputFormat">
+                        </label>
                     </template>
                 </div>
             </div>
@@ -64,17 +61,15 @@ defineEmits<{
                 <h3 class="text-xl text-zinc-400 mb-1">Quality</h3>
                 <div class="grid grid-cols-4">
                     <template v-for="(quality, index) in qualities">
-                        <div class="flex justify-center has-checked:bg-red-800/70 hover:bg-red-800/30 transition-all ease-out duration-100">
-                            <label :for="'quality_' + quality.name" class="w-40 py-3 text-center">
-                                {{ quality.name.toUpperCase() }}
-                            </label>
-                            <!-- <input type="radio" name="quality" :id="'quality_' + quality.name" :checked="index === 0" :value="quality.value" class="hidden"> -->
-                            <input type="radio" name="quality" :id="'quality_' + quality.name" :value="quality.value" class="hidden" v-model="inputQuality">
-                        </div>
+                        <label :for="'quality_' + quality.name" class="w-40 py-3 text-center has-checked:bg-red-800/70 hover:bg-red-800/30 cursor-pointer has-checked:cursor-default transition-all ease-out duration-100">
+                            {{ quality.name.toUpperCase() }}
+                            <input type="radio" name="quality" :id="'quality_' + quality.name" :value="quality.value" hidden v-model="inputQuality">
+                        </label>
                     </template>
                 </div>
             </div>
-            <button type="submit" class="flex justify-center gap-2 bg-red-800/70 rounded-full text-2xl py-2 hover:bg-red-800/50 active:bg-red-950/70 disabled:bg-red-950/70 transition-all ease-out duration-100" :disabled="processing">
+            <button type="submit" class="flex justify-center items-center gap-2 bg-red-800/70 rounded-full text-2xl py-2 hover:bg-red-800/50 active:bg-red-950/70 disabled:bg-red-950/70
+            cursor-pointer disabled:cursor-default transition-all ease-out duration-100" :disabled="processing">
                 <LoaderCircle v-if="processing" class="w-6 h-6 animate-spin" />
                 Convert & Download
             </button>

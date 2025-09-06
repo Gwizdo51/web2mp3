@@ -9,8 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use DomainException;
 
-use App\Models\Download;
-use App\Http\Requests\DownloadRequest;
+// use App\Http\Requests\DownloadRequest;
 use App\Services\DownloadService;
 
 
@@ -20,9 +19,13 @@ class MainController extends Controller {
         return Inertia::render('App');
     }
 
-    public function submitForm(DownloadRequest $request): JsonResponse {
+    public function submitForm(Request $request): JsonResponse {
         Log::debug('newDownloadRequest - called');
-        $validated = $request->validated();
+        $validated = $request->validate([
+            'link' => 'required|url',
+            'format' => 'required|string|in:mp3,m4a,flac,wav,aac,alac,opus,vorbis',
+            'quality' => 'required|integer|min:0|max:10',
+        ]);
         // process the form
         $downloadData = DownloadService::processForm(
             $validated['link'],

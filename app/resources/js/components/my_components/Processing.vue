@@ -5,9 +5,10 @@ import { QueueUpdatedMessage, ResultData } from '@/types';
 import { ref, onMounted } from 'vue';
 
 interface StatusApiResponseData {
-    fileName: Nullable<string>;
     queuePosition: number;
     state: number;
+    fileName: Nullable<string>;
+    error: Nullable<string>;
 }
 
 // state
@@ -83,7 +84,8 @@ function processApiResponse(jsonResponseData: StatusApiResponseData) {
         default: // succeeded or failed
             emit("linkProcessed", {
                 success: jsonResponseData.state === 3,
-                fileName: jsonResponseData.fileName
+                fileName: jsonResponseData.fileName,
+                error: jsonResponseData.error
             });
     }
 }

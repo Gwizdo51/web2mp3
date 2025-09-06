@@ -30,6 +30,7 @@ const formProcessing = ref<boolean>(false);
 const downloadId = ref<string>("");
 const success = ref<boolean>(true);
 const fileName = ref<string>("");
+const error = ref<string>("");
 
 // methods
 
@@ -109,6 +110,7 @@ function onLinkProcessed(data: ResultData) {
     // downloadID.value = "";
     success.value = data.success;
     fileName.value = data.fileName ?? "";
+    error.value = data.error ?? "";
     tabIndex.value = 2;
 }
 
@@ -125,6 +127,6 @@ function onReturn() {
         <Form v-if="tabIndex === 0" v-model:input-link="inputLink" v-model:input-format="inputFormat" v-model:input-quality="inputQuality"
         :link-error="linkError" :processing="formProcessing" @submit="submitForm" />
         <Processing v-else-if="tabIndex === 1" :download-id="downloadId" @link-processed="onLinkProcessed" />
-        <Result v-else-if="tabIndex === 2" :success="success" :download-id="downloadId" :file-name="fileName" @return="onReturn" />
+        <Result v-else-if="tabIndex === 2" :success="success" :download-id="downloadId" :file-name="fileName" :error="error" @return="onReturn" />
     </Layout>
 </template>

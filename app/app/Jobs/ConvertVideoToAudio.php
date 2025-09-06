@@ -5,11 +5,11 @@ namespace App\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
+// use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Queue;
 
 use App\Models\Download;
-use App\Events\LinkProcessed;
+// use App\Events\LinkProcessed;
 use App\Services\DownloadService;
 
 

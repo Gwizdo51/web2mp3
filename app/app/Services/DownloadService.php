@@ -25,10 +25,11 @@ class DownloadService {
         Log::debug("processForm - format : {$format}");
         Log::debug("processForm - quality : {$quality}");
         // normalize the link
-        $normalizedLink = self::normalizeLink($link);
-        Log::debug("processForm - normalized link : {$normalizedLink}");
+        // $normalizedLink = self::normalizeLink($link);
+        // Log::debug("processForm - normalized link : {$normalizedLink}");
         // check if a download with the same parameters already exists
-        $sameDownload = Download::where('youtube_url', $normalizedLink)
+        // $sameDownload = Download::where('youtube_url', $normalizedLink)
+        $sameDownload = Download::where('link', $link)
             ->where('format', $format)
             ->where('quality', $quality)
             ->where('state_id', '<>', 4)
@@ -38,7 +39,7 @@ class DownloadService {
         if ($sameDownload === null) {
             // save the download parameters in the database
             $download = Download::create([
-                'youtube_url' => $normalizedLink,
+                'link' => $link,
                 'format' => $format,
                 'quality' => $quality,
                 'state_id' => 1
@@ -69,14 +70,14 @@ class DownloadService {
         return $jsonResponseData;
     }
 
-    protected static function normalizeLink(string $link): string {
-        // extract the video ID from the submitted link
-        $queryParts = [];
-        parse_str(parse_url($link, PHP_URL_QUERY), $queryParts);
-        $videoID = $queryParts['v'];
-        // return a normalized link only containing the video ID
-        return "https://www.youtube.com/watch?v={$videoID}";
-    }
+    // protected static function normalizeLink(string $link): string {
+    //     // extract the video ID from the submitted link
+    //     $queryParts = [];
+    //     parse_str(parse_url($link, PHP_URL_QUERY), $queryParts);
+    //     $videoID = $queryParts['v'];
+    //     // return a normalized link only containing the video ID
+    //     return "https://www.youtube.com/watch?v={$videoID}";
+    // }
 
     public static function getStatus(string $downloadID) {
         Log::debug('getStatus - called');
@@ -85,9 +86,10 @@ class DownloadService {
             throw new DomainException('Download not found.');
         }
         return [
+            'queuePosition' => self::getQueuePosition($download),
             'state' => $download->state_id,
             'fileName' => $download->file_name,
-            'queuePosition' => self::getQueuePosition($download),
+            'error' => $download->error,
         ];
     }
 
@@ -121,38 +123,40 @@ class DownloadService {
         // sleep(10);
         // Process::run("touch ./storage/app/public/{$download->id}/prout");
         $ytdlpProcessString = "yt-dlp -x -f bestaudio --audio-format mp3 --audio-quality {$download->quality}"
-            ." -o \"/var/www/storage/app/public/{$download->id}/%(title)s.%(ext)s\" --no-cache-dir '{$download->youtube_url}'";
+            ." -o \"/var/www/storage/app/public/{$download->id}/%(title)s.%(ext)s\" --no-cache-dir '{$download->link}'";
         Log::debug('yt-dlp process string :');
         Log::debug($ytdlpProcessString);
-        $processResult = Process::timeout(300)->run($ytdlpProcessString);
+        $ytdlpProcessResult = Process::timeout(300)->run($ytdlpProcessString);
         Log::debug('yt-dlp standard output :');
-        Log::debug(trim($processResult->output()));
+        Log::debug(trim($ytdlpProcessResult->output()));
         Log::debug('yt-dlp error output :');
-        Log::debug(trim($processResult->errorOutput()));
-        if ($processResult->successful()) {
+        Log::debug(trim($ytdlpProcessResult->errorOutput()));
+        if ($ytdlpProcessResult->successful()) {
             Log::debug('handleConvertVideoToAudio - processing completed successfully');
             // get the name of the file that was created
-            $processResult = Process::run("ls ./storage/app/public/{$download->id}");
-            $fileName = trim($processResult->output());
+            $findFileNameProcessResult = Process::run("ls ./storage/app/public/{$download->id}");
+            $fileName = trim($findFileNameProcessResult->output());
             $download->update([
                 'state_id' => 3,
                 'file_name' => $fileName,
             ]);
             // broadcast the LinkProcessed event
             Log::debug('handleConvertVideoToAudio - broadcasting "LinkProcessed" event');
-            LinkProcessed::dispatch($download->id, true, $fileName);
+            LinkProcessed::dispatch($download->id, true, $fileName, null);
             // dispatch the deletion job for the newly downloaded file
             Log::debug('handleConvertVideoToAudio - queueing file deletion job');
             DeleteExpiredFile::dispatch($download)->delay(60*60);
         }
         else {
             Log::debug('handleConvertVideoToAudio - processing failed');
+            $error = trim($ytdlpProcessResult->errorOutput());
             $download->update([
                 'state_id' => 4,
+                'error' => $error,
             ]);
             // broadcast the LinkProcessed event
             Log::debug('handleConvertVideoToAudio - broadcasting "LinkProcessed" event');
-            LinkProcessed::dispatch($download->id, false);
+            LinkProcessed::dispatch($download->id, false, null, $error);
             // delete the folder that was just created
             Storage::deleteDirectory($download->id);
         }

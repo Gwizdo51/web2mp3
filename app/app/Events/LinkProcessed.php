@@ -17,14 +17,16 @@ class LinkProcessed implements ShouldBroadcastNow {
     protected string $DownloadID;
     public bool $success;
     public ?string $fileName;
+    public ?string $error;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $DownloadID, bool $success, ?string $fileName = null) {
+    public function __construct(string $DownloadID, bool $success, ?string $fileName, ?string $error) {
         $this->DownloadID = $DownloadID;
         $this->success = $success;
         $this->fileName = $fileName;
+        $this->error = $error;
     }
 
     /**
