@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { LoaderCircle } from 'lucide-vue-next';
+import { LoaderCircle } from "lucide-vue-next";
 import { useEchoPublic } from "@laravel/echo-vue";
-import { QueueUpdatedMessage, ResultData } from '@/types';
-import { ref, onMounted } from 'vue';
+import { QueueUpdatedMessage, ResultData } from "@/types";
+import { ref, onMounted } from "vue";
 
 interface StatusApiResponseData {
     queuePosition: number;

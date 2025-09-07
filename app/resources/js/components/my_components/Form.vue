@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import Layout from '@/layouts/Layout.vue';
 // import { Form } from '@inertiajs/vue3';
-import { CircleAlert, LoaderCircle } from 'lucide-vue-next';
+import { CircleAlert, LoaderCircle } from "lucide-vue-next";
 
 // static data
 const formats = ["mp3", "m4a", "flac", "wav", "aac", "alac", "opus", "vorbis"];

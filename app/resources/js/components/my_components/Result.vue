@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Check, X, Download } from 'lucide-vue-next';
-import { onMounted } from 'vue';
+import { Check, X, Download } from "lucide-vue-next";
+import { onMounted } from "vue";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 
 // props
 const {success, downloadId, fileName, error} = defineProps<{
@@ -85,7 +85,7 @@ defineEmits<{
             </div>
         </div> -->
         <div class="text-center text-xl">
-            <a href="/" @click.prevent="$emit('return');" class="underline hover:decoration-red-500 transition-all ease-out duration-200">Convert another link</a>
+            <a href="/" @click.prevent="$emit('return');" class="underline hover:decoration-red-600 transition-all ease-out duration-200">Convert another link</a>
         </div>
     </div>
 </template>
