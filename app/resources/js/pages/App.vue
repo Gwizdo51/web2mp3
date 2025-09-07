@@ -5,7 +5,6 @@ import Form from "@/components/my_components/Form.vue";
 import Processing from "@/components/my_components/Processing.vue";
 import Result from "@/components/my_components/Result.vue";
 import { ResultData } from "@/types";
-import { setCookie, getCookie } from "@/lib/utils";
 
 interface SubmitApiResponseData {
     id: string;
@@ -20,16 +19,13 @@ const tabTitles: string[] = [
     "Result"
 ];
 
-// load format and quality from the cookies
-const formatFromCookie = getCookie("format");
-const qualityFromCookie = getCookie("quality");
-
 // state variables
 const tabIndex = ref<number>(0);
 const tabTitle = computed<string>(() => tabTitles[tabIndex.value]);
 const inputLink = ref<string>("");
-// init format and quality from the cookies, default if no cookies
-const inputFormat = ref<string>(formatFromCookie ?? "mp3");
+// init format and quality from the local storage, default if absent
+const inputFormat = ref<string>(localStorage.getItem("format") ?? "mp3");
+const qualityFromCookie = localStorage.getItem("quality");
 const inputQuality = ref<number>(qualityFromCookie ? Number(qualityFromCookie) : 0);
 const linkError = ref<string>("");
 const formProcessing = ref<boolean>(false);
@@ -45,10 +41,9 @@ async function submitForm(): Promise<void> {
     console.log(`inputLink: ${inputLink.value}`);
     console.log(`inputFormat: ${inputFormat.value}`);
     console.log(`inputQuality: ${inputQuality.value}`);
-    // save the chosen format and quality in the cookies
-    setCookie("format", inputFormat.value);
-    setCookie("quality", String(inputQuality.value));
-    // tabIndex.value = 1;
+    // save the chosen format and quality in the local storage
+    localStorage.setItem("format", inputFormat.value);
+    localStorage.setItem("quality", String(inputQuality.value));
     // const formElements = document.forms[0].elements as FormElements<"link" | "format" | "quality">;
     // console.log(formElements.link.value);
     // console.log(formElements.format.value);
