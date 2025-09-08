@@ -23,7 +23,8 @@ const tabTitles: string[] = [
 const tabIndex = ref<number>(0);
 const tabTitle = computed<string>(() => tabTitles[tabIndex.value]);
 const inputLink = ref<string>("");
-// init format and quality from the local storage, default if absent
+// init format and quality from the local storage
+// default to "mp3" and "best" if absent
 const inputFormat = ref<string>(localStorage.getItem("format") ?? "mp3");
 const qualityFromCookie = localStorage.getItem("quality");
 const inputQuality = ref<number>(qualityFromCookie ? Number(qualityFromCookie) : 0);
@@ -83,9 +84,9 @@ async function submitForm(): Promise<void> {
 }
 
 function processResponse(jsonResponse: SubmitApiResponseData) {
-    // reset the link input field
-    linkError.value = "";
+    // reset the link input field and the error string
     inputLink.value = "";
+    linkError.value = "";
     if (jsonResponse.state <= 2) {
         // update the props for the "Processing" component
         downloadId.value = jsonResponse.id;
@@ -97,13 +98,6 @@ function processResponse(jsonResponse: SubmitApiResponseData) {
         downloadId.value = jsonResponse.id;
         success.value = true;
         fileName.value = jsonResponse.fileName as string;
-        // display it
-        tabIndex.value = 2;
-    }
-    else {
-        // update the props for the "Result component"
-        downloadId.value = jsonResponse.id;
-        success.value = false;
         // display it
         tabIndex.value = 2;
     }
