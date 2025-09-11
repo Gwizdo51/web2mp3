@@ -25,6 +25,11 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
     })
+    // when the application is served behind a proxy
+    // https://laravel.com/docs/12.x/requests#configuring-trusted-proxies
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         // handle validation exception
         $exceptions->renderable(function (ValidationException $e, $request) {

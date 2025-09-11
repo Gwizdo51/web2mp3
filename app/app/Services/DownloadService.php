@@ -122,7 +122,7 @@ class DownloadService {
         // launch the yt-dlp process
         // sleep(10);
         // Process::run("touch ./storage/app/public/{$download->id}/prout");
-        $ytdlpProcessString = "yt-dlp -x -f bestaudio --audio-format mp3 --audio-quality {$download->quality}"
+        $ytdlpProcessString = "yt-dlp -x -f bestaudio --audio-format {$download->format} --audio-quality {$download->quality}"
             ." -o \"/var/www/storage/app/public/{$download->id}/%(title)s.%(ext)s\" --no-cache-dir '{$download->link}'";
         Log::debug('yt-dlp process string :');
         Log::debug($ytdlpProcessString);

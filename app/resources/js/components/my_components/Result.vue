@@ -28,9 +28,9 @@ onMounted(() => {
     }
 });
 
-function cropString(stringToCrop: string, maxLength: number): string {
-    return stringToCrop.length > maxLength ? stringToCrop.substring(0, maxLength) + "..." : stringToCrop;
-}
+// function cropString(stringToCrop: string, maxLength: number): string {
+//     return stringToCrop.length > maxLength ? stringToCrop.substring(0, maxLength) + "..." : stringToCrop;
+// }
 
 // emits
 defineEmits<{
@@ -44,7 +44,12 @@ defineEmits<{
         <div class="relative flex flex-col items-center">
             <template v-if="success">
                 <Check strokeWidth="1" class="absolute bottom-5 w-30 h-30 text-green-600" />
-                <p class="text-xl pt-20"><span class="text-amber-400">{{ cropString(fileName, 60) }}</span> is ready !</p>
+                <p class="flex text-xl pt-20">
+                    <div class="text-amber-400 truncate max-w-xl">
+                        {{ fileName }}
+                    </div>
+                    &nbsp;is ready !
+                </p>
             </template>
             <template v-else>
                 <X strokeWidth="1" class="absolute bottom-5 w-30 h-30 text-red-800" />

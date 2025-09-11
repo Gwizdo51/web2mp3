@@ -13,13 +13,13 @@ export default defineConfig({
         strictPort: true, // vite should fail if the 5173 port is not available
         cors: {
             // origin: 'http://100.100.151.68', // the IP address of the server
-            origin: 'https://yt2mp3.100.100.151.68.nip.io', // the IP address of the server
+            origin: 'https://web2mp3.100.124.238.99.nip.io', // the IP address of the server
             // origin: 'https://yt2mp3.100.100.151.68.nip.io:5000', // the IP address of the server
             credentials: true,
         },
         hmr: {
             // host: '100.100.151.68' // the IP address of the server
-            host: 'yt2mp3.100.100.151.68.nip.io', // the IP address of the server
+            host: 'web2mp3.100.124.238.99.nip.io', // the IP address of the server
         },
         https: {
             cert: fs.readFileSync(path.resolve(__dirname, '/mnt/self.crt')),

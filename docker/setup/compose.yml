@@ -3,13 +3,13 @@ name: "setup"
 networks:
   net:
     driver: "bridge"
-    name: "yt2mp3_setup_net"
+    name: "web2mp3_setup"
 
 services:
 
   # used to pull Composer dependencies (app/vendor/)
   composer:
-    container_name: "yt2mp3_setup_composer"
+    container_name: "web2mp3_setup_composer"
     networks:
     - "net"
     build:
@@ -19,7 +19,7 @@ services:
       #   UID: 1000
       #   GID: 1000
       #   USERNAME: "user"
-    image: "yt2mp3/app"
+    image: "web2mp3/app"
     volumes:
     - "../../app:/var/www"
     # run as the user that cloned the repository (replace if necessary)
@@ -33,13 +33,13 @@ services:
   # to create a new project :
   # docker compose run --rm laravel new app
   laravel:
-    container_name: "yt2mp3_setup_laravel"
+    container_name: "web2mp3_setup_laravel"
     networks:
     - "net"
     build:
       context: "../"
       target: "laravel_image"
-    image: "yt2mp3/setup_laravel"
+    image: "web2mp3/laravel"
     volumes:
     - "../..:/var/www"
     # run as the user that cloned the repository (replace if necessary)
@@ -49,7 +49,7 @@ services:
 
   # used to pull NodeJS dependencies (app/node_modules/)
   node:
-    container_name: "yt2mp3_setup_node"
+    container_name: "web2mp3_setup_node"
     networks:
     - "net"
     image: "node:24.4.0"
@@ -65,17 +65,17 @@ services:
 
   # used to create a SSL/TLS certificate
   certificate_generator:
-    container_name: "yt2mp3_setup_certificate_generator"
+    container_name: "web2mp3_setup_certificate_generator"
     networks:
     - "net"
     build:
       context: "../"
       target: "certificate_generator_image"
-    image: "yt2mp3/setup_certificate_generator"
+    image: "web2mp3/setup_certificate_generator"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
     volumes:
-    - "/home/arthur/code/docker_data/yt2mp3/certs:/mnt" # modify if necessary
+    - "/srv/docker_data/web2mp3/certs:/mnt" # modify if necessary
     # entrypoint: "bash"
     command:
     - "req"

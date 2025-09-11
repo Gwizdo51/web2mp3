@@ -1,13 +1,9 @@
-name: "server"
+name: "web2mp3_server"
 
 networks:
   net:
-    driver: "bridge"
-    name: "yt2mp3_server_net"
-    # ipam:
-    #   config:
-    #   - subnet: "172.16.0.0/24"
-    #     gateway: "172.16.0.1"
+    name: "webapps"
+    external: true
 
 services:
 
@@ -42,13 +38,13 @@ services:
   #   # run as the user that cloned the repository (replace if necessary)
   #   user: "1000:1000"
   #   restart: unless-stopped
-  database:
-    container_name: "yt2mp3_server_database"
+  web2mp3_database:
+    container_name: "web2mp3_server_database"
     networks:
     - "net"
     image: "postgres:17.6"
     volumes:
-    - "/home/arthur/code/docker_data/yt2mp3/database:/var/lib/postgresql/data"
+    - "/srv/docker_data/web2mp3:/var/lib/postgresql/data"
     environment:
       POSTGRES_PASSWORD: "123456789"
       POSTGRES_USER: "laravel"
@@ -67,17 +63,17 @@ services:
     # restart: unless-stopped
 
   # contains the PHP-FPM processor
-  app:
-    container_name: "yt2mp3_server_app"
+  web2mp3_app:
+    container_name: "web2mp3_server_app"
     networks:
     - "net"
     build:
       context: "../"
       target: "app_image"
-    image: "yt2mp3/app"
+    image: "web2mp3/app"
     depends_on:
     # - "database"
-      database:
+      web2mp3_database:
         condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
@@ -96,39 +92,40 @@ services:
     # - "0.0.0.0"
 
   # contains a supervisor instance that controls Laravel queue workers
-  jobs:
-    container_name: "yt2mp3_server_jobs"
+  web2mp3_jobs:
+    container_name: "web2mp3_server_jobs"
     networks:
     - "net"
     build:
       context: "../"
       target: "supervisor_image"
-    image: "yt2mp3/server_jobs"
+    image: "web2mp3/jobs"
     volumes:
-    - "./queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"
+    - "../queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"
     - "../../app:/var/www"
-    - "/home/arthur/code/docker_data/yt2mp3/certs/self.crt:/mnt/self.pem:ro"
+    - "/srv/docker_data/certs/self.crt:/mnt/self.pem:ro"
     depends_on:
-      database:
+      web2mp3_database:
         condition: "service_healthy"
     environment:
       # either "work" (production) or "listen" (development)
-      WORKER_MODE: "listen"
+      # WORKER_MODE: "listen"
+      WORKER_MODE: "work"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
     # restart: unless-stopped
     # entrypoint: "bash"
 
-  reverb:
-    container_name: "yt2mp3_server_reverb"
+  web2mp3_reverb:
+    container_name: "web2mp3_server_reverb"
     networks:
     - "net"
     build:
       context: "../"
       target: "app_image"
-    image: "yt2mp3/app"
+    image: "web2mp3/app"
     depends_on:
-      database:
+      web2mp3_database:
         condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
@@ -142,8 +139,8 @@ services:
     # - "--debug"
 
   # used to run "npm run dev" to watch for changes in files
-  node:
-    container_name: "yt2mp3_server_node"
+  web2mp3_node:
+    container_name: "web2mp3_server_node"
     networks:
     - "net"
     image: "node:24.4.0"
@@ -153,41 +150,41 @@ services:
     working_dir: "/app"
     volumes:
     - "../../app:/app"
-    - "/home/arthur/code/docker_data/yt2mp3/certs:/mnt:ro"
+    - "/srv/docker_data/certs:/mnt:ro"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
-    ports:
-    - "5173:5173"
-    command: # dev
-    - "npm"
-    - "run"
-    - "dev"
-    # command: # build
-    # - "bash"
-    # - "-c"
-    # - "rm -f /app/public/hot && npm run build"
+    # command: # dev
+    # - "npm"
+    # - "run"
+    # - "dev"
+    # ports:
+    # - "5173:5173"
+    command: # build
+    - "bash"
+    - "-c"
+    - "rm -f /app/public/hot && npm run build"
     # restart: unless-stopped
 
   # contains the NGINX web server
-  web:
-    container_name: "yt2mp3_server_web"
+  web2mp3_nginx:
+    container_name: "web2mp3_server_nginx"
     networks:
     - "net"
     build:
       context: "../"
       target: "nginx_image"
-    image: "yt2mp3/server_web"
+    image: "web2mp3/nginx"
     depends_on:
-    - "app"
-    - "jobs"
-    - "reverb"
+    - "web2mp3_app"
+    - "web2mp3_jobs"
+    - "web2mp3_reverb"
     volumes:
-    - "/home/arthur/code/docker_data/yt2mp3/certs:/etc/nginx/certs:ro" # modify if necessary
+    # - "/home/arthur/code/docker_data/yt2mp3/certs:/etc/nginx/certs:ro" # modify if necessary
     - "./vhost.conf:/etc/nginx/conf.d/default.conf"
     - "../../app:/var/www"
-    ports:
-    - "80:80"
-    - "443:443"
+    # ports:
+    # - "80:80"
+    # - "443:443"
     # - "5000:5000"
     # restart: unless-stopped
     # entrypoint: "bash"
