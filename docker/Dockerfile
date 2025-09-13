@@ -43,6 +43,7 @@ RUN chmod a+x /usr/local/bin/yt-dlp
 # run supervisor in the foreground
 CMD ["supervisord", "-nc", "/etc/supervisor/conf.d/queue_worker.conf"]
 
+# Laravel installer
 FROM app_image AS laravel_image
 # ARG USERNAME
 # USER root
@@ -62,6 +63,9 @@ WORKDIR /var/www
 
 # SQLite 3.50 command line tools
 FROM debian:bookworm AS sqlite_cli_image
+ARG UID=1000
+ARG GID=1000
+ARG USERNAME=user
 # RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp
 # ADD https://sqlite.org/2025/sqlite-tools-linux-x64-3500400.zip /tmp
 RUN apt-get update
@@ -69,4 +73,8 @@ RUN apt-get update
 RUN apt-get install -y sqlite3
 # RUN unzip /tmp/sqlite-tools-linux-x64-3500400.zip -d /usr/local/bin
 # WORKDIR /tmp
+# add a user with a home directory
+RUN groupadd -g ${GID} ${USERNAME}
+RUN useradd -mNu ${UID} -g ${GID} -s /bin/bash ${USERNAME}
+COPY ./.sqliterc /home/${USERNAME}
 ENTRYPOINT ["sqlite3"]

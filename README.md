@@ -99,6 +99,7 @@ Possible states :
 ### SQLite3 CLI
 
 - Exit : `.exit`
+- Format output : `.mode line`
 - See details about the current database : `.databases`
 - See all tables : `.tables`
 - See details about a table : `.schema <table_name>`
