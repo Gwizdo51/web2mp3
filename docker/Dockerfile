@@ -20,7 +20,7 @@ FROM php:8.4-fpm AS app_image
 # https://github.com/mlocati/docker-php-extension-installer
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 # RUN install-php-extensions @composer intl bcmath pdo_mysql zip
-RUN install-php-extensions @composer pdo_pgsql pcntl
+RUN install-php-extensions @composer pdo_pgsql pcntl intl
 RUN rm /usr/local/bin/install-php-extensions
 # install ca-certificates to enable sending HTTPS requests to the windows server
 # RUN apt-get update
@@ -59,3 +59,14 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log
 RUN ln -sf /dev/stderr /var/log/nginx/error.log
 # set the working directory
 WORKDIR /var/www
+
+# SQLite 3.50 command line tools
+FROM debian:bookworm AS sqlite_cli_image
+# RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp
+# ADD https://sqlite.org/2025/sqlite-tools-linux-x64-3500400.zip /tmp
+RUN apt-get update
+# RUN apt-get install -y unzip
+RUN apt-get install -y sqlite3
+# RUN unzip /tmp/sqlite-tools-linux-x64-3500400.zip -d /usr/local/bin
+# WORKDIR /tmp
+ENTRYPOINT ["sqlite3"]

@@ -10,7 +10,7 @@ defineProps<{
 <template>
     <Head :title="title" />
     <div class="bg-zinc-950 min-h-screen flex flex-col justify-center items-center selection:bg-foreground selection:text-gray-950">
-        <div class="relative w-3xl h-144 pt-10 bg-red-950/30 rounded-3xl border-2 border-red-800 flex justify-center">
+        <div class="relative w-3xl h-144 pt-10 mt-[38px] bg-red-950/30 rounded-3xl border-2 border-red-800 flex justify-center">
             <Link href="/" class="absolute h-20 w-xl -top-10 bg-zinc-900 rounded-full border-2 border-red-800 flex justify-center items-center text-3xl text-shadow-lg/80">
                 Web 2 mp3
             </Link>

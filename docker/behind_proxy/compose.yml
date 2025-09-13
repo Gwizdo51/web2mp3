@@ -38,29 +38,30 @@ services:
   #   # run as the user that cloned the repository (replace if necessary)
   #   user: "1000:1000"
   #   restart: unless-stopped
-  web2mp3_database:
-    container_name: "web2mp3_server_database"
-    networks:
-    - "net"
-    image: "postgres:17.6"
-    volumes:
-    - "/srv/docker_data/web2mp3:/var/lib/postgresql/data"
-    environment:
-      POSTGRES_PASSWORD: "123456789"
-      POSTGRES_USER: "laravel"
-    healthcheck:
-      test:
-      - "CMD-SHELL"
-      - "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_USER"
-      start_period: "60s"
-      interval: "5s"
-      timeout: "5s"
-      retries: 12
-    ports:
-    - "5432:5432"
-    user: "1000:1000"
-    # entrypoint: "bash"
-    # restart: unless-stopped
+
+  # web2mp3_database:
+  #   container_name: "web2mp3_server_database"
+  #   networks:
+  #   - "net"
+  #   image: "postgres:17.6"
+  #   volumes:
+  #   - "/srv/docker_data/web2mp3/postgres:/var/lib/postgresql/data"
+  #   environment:
+  #     POSTGRES_PASSWORD: "123456789"
+  #     POSTGRES_USER: "laravel"
+  #   healthcheck:
+  #     test:
+  #     - "CMD-SHELL"
+  #     - "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_USER"
+  #     start_period: "60s"
+  #     interval: "5s"
+  #     timeout: "5s"
+  #     retries: 12
+  #   ports:
+  #   - "5432:5432"
+  #   user: "1000:1000"
+  #   # entrypoint: "bash"
+  #   # restart: unless-stopped
 
   # contains the PHP-FPM processor
   web2mp3_app:
@@ -71,12 +72,14 @@ services:
       context: "../"
       target: "app_image"
     image: "web2mp3/app"
-    depends_on:
-    # - "database"
-      web2mp3_database:
-        condition: "service_healthy"
+    # depends_on:
+    # # - "database"
+    #   web2mp3_database:
+    #     condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
+    - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
+    - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
     # - "/home/arthur/code/docker_data/yt2mp3/certs/self.crt:/mnt/self.pem:ro"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
@@ -103,10 +106,12 @@ services:
     volumes:
     - "../queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"
     - "../../app:/var/www"
+    - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
+    - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
     - "/srv/docker_data/certs/self.crt:/mnt/self.pem:ro"
-    depends_on:
-      web2mp3_database:
-        condition: "service_healthy"
+    # depends_on:
+    #   web2mp3_database:
+    #     condition: "service_healthy"
     environment:
       # either "work" (production) or "listen" (development)
       # WORKER_MODE: "listen"
@@ -124,11 +129,12 @@ services:
       context: "../"
       target: "app_image"
     image: "web2mp3/app"
-    depends_on:
-      web2mp3_database:
-        condition: "service_healthy"
+    # depends_on:
+    #   web2mp3_database:
+    #     condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
+    - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
     # - "/home/arthur/code/docker_data/yt2mp3/certs/self.crt:/mnt/self.pem:ro"
     # ports:
     # - "9001:9001"
@@ -153,16 +159,16 @@ services:
     - "/srv/docker_data/certs:/mnt:ro"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
-    # command: # dev
-    # - "npm"
-    # - "run"
-    # - "dev"
-    # ports:
-    # - "5173:5173"
-    command: # build
-    - "bash"
-    - "-c"
-    - "rm -f /app/public/hot && npm run build"
+    command: # dev
+    - "npm"
+    - "run"
+    - "dev"
+    ports:
+    - "5173:5173"
+    # command: # build
+    # - "bash"
+    # - "-c"
+    # - "rm -f /app/public/hot && npm run build"
     # restart: unless-stopped
 
   # contains the NGINX web server
@@ -182,6 +188,7 @@ services:
     # - "/home/arthur/code/docker_data/yt2mp3/certs:/etc/nginx/certs:ro" # modify if necessary
     - "./vhost.conf:/etc/nginx/conf.d/default.conf"
     - "../../app:/var/www"
+    - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
     # ports:
     # - "80:80"
     # - "443:443"

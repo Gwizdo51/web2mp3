@@ -26,6 +26,10 @@ Artisan::command('inspire', function () {
 //     $this->comment($result->output());
 // });
 
+// Artisan::command('mkdir', function () {
+//     Storage::makeDirectory('prout');
+// });
+
 // Artisan::command('rmDir', function () {
 //     $result = Process::run('rm -r ./storage/app/public/dir');
 //     $this->comment($result->output());

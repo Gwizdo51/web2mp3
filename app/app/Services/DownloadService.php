@@ -123,7 +123,7 @@ class DownloadService {
         // sleep(10);
         // Process::run("touch ./storage/app/public/{$download->id}/prout");
         $ytdlpProcessString = "yt-dlp -x -f bestaudio --audio-format {$download->format} --audio-quality {$download->quality}"
-            ." -o \"/var/www/storage/app/public/{$download->id}/%(title)s.%(ext)s\" --no-cache-dir '{$download->link}'";
+            ." -o \"/var/www/storage/app/public/{$download->id}/%(title)s.%(ext)s\" --no-playlist --no-cache-dir '{$download->link}'";
         Log::debug('yt-dlp process string :');
         Log::debug($ytdlpProcessString);
         $ytdlpProcessResult = Process::timeout(300)->run($ytdlpProcessString);
@@ -146,6 +146,7 @@ class DownloadService {
             // dispatch the deletion job for the newly downloaded file
             Log::debug('handleConvertVideoToAudio - queueing file deletion job');
             DeleteExpiredFile::dispatch($download)->delay(60*60);
+            // DeleteExpiredFile::dispatch($download)->delay(60);
         }
         else {
             Log::debug('handleConvertVideoToAudio - processing failed');

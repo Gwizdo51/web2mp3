@@ -91,3 +91,19 @@ services:
     - "/mnt/self.crt"
     - "-subj"
     - "/C=FR/ST=Dev/L=Local/O=LocalDev/OU=Dev/CN=yt2mp3.100.100.151.68.nip.io"
+
+  # SQLite command line tools
+  sqlite_cli:
+    container_name: "web2mp3_setup_sqlite_cli"
+    networks:
+    - "net"
+    build:
+      context: "../"
+      target: "sqlite_cli_image"
+    image: "web2mp3/sqlite_cli"
+    user: "1000:1000"
+    volumes:
+    - "/srv/docker_data/web2mp3/sqlite:/sqlite" # modify if necessary
+    working_dir: "/sqlite"
+    command:
+    - "database.sqlite"

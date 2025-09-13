@@ -45,7 +45,7 @@ defineEmits<{
             <template v-if="success">
                 <Check strokeWidth="1" class="absolute bottom-5 w-30 h-30 text-green-600" />
                 <p class="flex text-xl pt-20">
-                    <div class="text-amber-400 truncate max-w-xl">
+                    <div class="text-amber-400 max-w-xl truncate">
                         {{ fileName }}
                     </div>
                     &nbsp;is ready !

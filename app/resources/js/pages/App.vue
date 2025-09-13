@@ -26,8 +26,8 @@ const inputLink = ref<string>("");
 // init format and quality from the local storage
 // default to "mp3" and "best" if absent
 const inputFormat = ref<string>(localStorage.getItem("format") ?? "mp3");
-const qualityFromCookie = localStorage.getItem("quality");
-const inputQuality = ref<number>(qualityFromCookie ? Number(qualityFromCookie) : 0);
+const qualityFromStorage = localStorage.getItem("quality");
+const inputQuality = ref<number>(qualityFromStorage ? Number(qualityFromStorage) : 0);
 const linkError = ref<string>("");
 const formProcessing = ref<boolean>(false);
 const downloadId = ref<string>("");
