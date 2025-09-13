@@ -33,10 +33,10 @@ defineEmits<{
 <template>
     <!-- <Link :href="route('home')" class="before:content-['>_'] before:mr-1 after:content-['_<'] after:ml-1">Return to home</Link> -->
     <!-- <Form method="post" class="flex flex-col place-content-evenly" v-slot="{ errors, processing }"> -->
-    <form @submit.prevent="$emit('submit')" class="flex flex-col place-content-evenly">
+    <form @submit.prevent="$emit('submit')" class="flex flex-col grow md:grow-0 place-content-evenly gap-8 md:gap-0">
         <div class="relative flex flex-col items-center">
             <label for="inputLink" class="text-xl text-zinc-400 mb-1">Link</label>
-            <input id="inputLink" type="text" class="border-b-2 border-zinc-700 w-160 outline-none focus:border-red-800 text-center placeholder:text-zinc-700 hover:border-red-800/50 transition-all ease-out duration-200"
+            <input id="inputLink" type="text" class="border-b-2 border-zinc-700 w-full outline-none focus:border-red-800 text-center placeholder:text-zinc-700 hover:border-red-800/50 transition-all ease-out duration-200"
             name="link" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ" required v-model="inputLink">
             <div v-if="linkError" class="absolute flex items-center gap-1 text-sm text-red-500 -bottom-6">
                 <CircleAlert class="h-5 w-5" />
@@ -45,9 +45,9 @@ defineEmits<{
         </div>
         <div class="flex flex-col items-center">
             <h3 class="text-xl text-zinc-400 mb-1">Audio format</h3>
-            <div class="grid grid-cols-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 w-full">
                 <template v-for="(format, index) in formats">
-                    <label :for="'format_' + format" class="w-40 py-3 text-center has-checked:bg-red-800/70 hover:bg-red-800/30 cursor-pointer has-checked:cursor-default transition-all ease-out duration-100">
+                    <label :for="'format_' + format" class="md:w-40 py-3 text-center has-checked:bg-red-800/70 hover:bg-red-800/30 cursor-pointer has-checked:cursor-default transition-all ease-out duration-100">
                         {{ format.toUpperCase() }}
                         <input type="radio" name="format" :id="'format_' + format" :value="format" hidden v-model="inputFormat">
                     </label>
@@ -56,9 +56,9 @@ defineEmits<{
         </div>
         <div class="flex flex-col items-center">
             <h3 class="text-xl text-zinc-400 mb-1">Quality</h3>
-            <div class="grid grid-cols-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 w-full">
                 <template v-for="(quality, index) in qualities">
-                    <label :for="'quality_' + quality.name" class="w-40 py-3 text-center has-checked:bg-red-800/70 hover:bg-red-800/30 cursor-pointer has-checked:cursor-default transition-all ease-out duration-100">
+                    <label :for="'quality_' + quality.name" class="md:w-40 py-3 text-center has-checked:bg-red-800/70 hover:bg-red-800/30 cursor-pointer has-checked:cursor-default transition-all ease-out duration-100">
                         {{ quality.name.toUpperCase() }}
                         <input type="radio" name="quality" :id="'quality_' + quality.name" :value="quality.value" hidden v-model="inputQuality">
                     </label>

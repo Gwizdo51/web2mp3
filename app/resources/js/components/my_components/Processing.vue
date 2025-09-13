@@ -95,6 +95,6 @@ function processApiResponse(jsonResponseData: StatusApiResponseData) {
 <template>
     <div class="flex flex-col justify-center items-center gap-5">
         <LoaderCircle strokeWidth="1" class="w-25 h-25 animate-spin text-red-800" />
-        <p class="text-xl">{{ displayedText }}</p>
+        <p class="text-xl text-center">{{ displayedText }}</p>
     </div>
 </template>
