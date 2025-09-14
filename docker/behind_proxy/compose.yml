@@ -108,7 +108,7 @@ services:
     - "../../app:/var/www"
     - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
     - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
-    - "/srv/docker_data/certs/self.crt:/mnt/self.pem:ro"
+    - "/srv/docker_data/certs/self.crt:/mnt/self.crt:ro"
     # depends_on:
     #   web2mp3_database:
     #     condition: "service_healthy"
@@ -159,16 +159,20 @@ services:
     - "/srv/docker_data/certs:/mnt:ro"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
-    command: # dev
-    - "npm"
-    - "run"
-    - "dev"
-    ports:
-    - "5173:5173"
-    # command: # build
-    # - "bash"
-    # - "-c"
-    # - "rm -f /app/public/hot && npm run build"
+    ### DEV ###
+    # command:
+    # - "npm"
+    # - "run"
+    # - "dev"
+    # ports:
+    # - "5173:5173"
+    ### END DEV ###
+    ### PROD ###
+    command:
+    - "bash"
+    - "-c"
+    - "rm -f /app/public/hot && npm run build"
+    ### END PROD ###
     # restart: unless-stopped
 
   # contains the NGINX web server

@@ -1,15 +1,15 @@
-name: "setup"
+name: "tools"
 
 networks:
   net:
     driver: "bridge"
-    name: "web2mp3_setup"
+    name: "web2mp3_tools"
 
 services:
 
   # used to pull Composer dependencies (app/vendor/)
   composer:
-    container_name: "web2mp3_setup_composer"
+    container_name: "web2mp3_tools_composer"
     networks:
     - "net"
     build:
@@ -33,7 +33,7 @@ services:
   # to create a new project :
   # docker compose run --rm laravel new app
   laravel:
-    container_name: "web2mp3_setup_laravel"
+    container_name: "web2mp3_tools_laravel"
     networks:
     - "net"
     build:
@@ -49,7 +49,7 @@ services:
 
   # used to pull NodeJS dependencies (app/node_modules/)
   node:
-    container_name: "web2mp3_setup_node"
+    container_name: "web2mp3_tools_node"
     networks:
     - "net"
     image: "node:24.4.0"
@@ -65,13 +65,13 @@ services:
 
   # used to create a SSL/TLS certificate
   certificate_generator:
-    container_name: "web2mp3_setup_certificate_generator"
+    container_name: "web2mp3_tools_certificate_generator"
     networks:
     - "net"
     build:
       context: "../"
       target: "certificate_generator_image"
-    image: "web2mp3/setup_certificate_generator"
+    image: "web2mp3/certificate_generator"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
     volumes:
@@ -94,7 +94,7 @@ services:
 
   # SQLite command line tools
   sqlite_cli:
-    container_name: "web2mp3_setup_sqlite_cli"
+    container_name: "web2mp3_tools_sqlite_cli"
     networks:
     - "net"
     build:
@@ -106,4 +106,5 @@ services:
     - "/srv/docker_data/web2mp3/sqlite:/sqlite" # modify if necessary
     working_dir: "/sqlite"
     command:
+    - "-line" # set output mode to 'line'
     - "database.sqlite"

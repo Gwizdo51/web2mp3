@@ -5,16 +5,22 @@ A small web project in Laravel + Vue to download songs from YouTube
 # TODO
 
 - [ ] Add setup and run steps to README.md (for dev server + behind proxy)
-- [ ] Make the website responsive
+- [x] Make the website responsive
 - [x] Check for a faster/lighter DB (Redis ? SQLite ?)
 
-# Setup
+## Requirements
+
+Docker
+
+## Setup
 
 - Install Composer dependencies
 - Install NPM dependencies
+- Create docker_data folder tree
 - Migrate database
 - Generate new app + Reverb keys
 - Add storage link
+- `php artisan optimize`
 - Adapt Docker files to your environment
 
 # DUMP
@@ -51,7 +57,7 @@ A small web project in Laravel + Vue to download songs from YouTube
 - Restart the web server : `sudo systemctl restart apache2`
 - Replace in .env :
     ```
-    DB_CONNECTION=mysql
+    DB_CONNECTION=postgres
     DB_HOST=127.0.0.1
     DB_PORT=5432
     DB_DATABASE=laravel
