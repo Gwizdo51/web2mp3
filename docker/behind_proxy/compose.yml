@@ -72,10 +72,12 @@ services:
       context: "../"
       target: "app_image"
     image: "web2mp3/app"
-    # depends_on:
+    depends_on:
     # # - "database"
     #   web2mp3_database:
     #     condition: "service_healthy"
+      web2mp3_redis:
+        condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
     - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
@@ -109,9 +111,11 @@ services:
     - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
     - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
     - "/srv/docker_data/certs/self.crt:/mnt/self.crt:ro"
-    # depends_on:
+    depends_on:
     #   web2mp3_database:
     #     condition: "service_healthy"
+      web2mp3_redis:
+        condition: "service_healthy"
     environment:
       # either "work" (production) or "listen" (development)
       # WORKER_MODE: "listen"
@@ -129,9 +133,11 @@ services:
       context: "../"
       target: "app_image"
     image: "web2mp3/app"
-    # depends_on:
+    depends_on:
     #   web2mp3_database:
     #     condition: "service_healthy"
+      web2mp3_redis:
+        condition: "service_healthy"
     volumes:
     - "../../app:/var/www"
     - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
@@ -143,6 +149,24 @@ services:
     - "artisan"
     - "reverb:start"
     # - "--debug"
+
+  web2mp3_redis:
+    container_name: "web2mp3_server_redis"
+    networks:
+    - "net"
+    image: "redis:8.2.1-bookworm"
+    volumes:
+    - "/srv/docker_data/web2mp3/redis:/data"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: "5s"
+      timeout: "5s"
+      retries: 3
+    command:
+    - "redis-server"
+    - "--save 60 1"
+    - "--appendonly yes"
+    - "--appendfsync everysec"
 
   # used to run "npm run dev" to watch for changes in files
   web2mp3_node:

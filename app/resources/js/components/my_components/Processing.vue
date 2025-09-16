@@ -19,6 +19,7 @@ const displayedText = ref<string>("Requesting status ...");
 const {downloadId} = defineProps<{
     downloadId: string;
 }>();
+console.log(`current download ID : ${downloadId}`);
 
 // emits
 const emit = defineEmits<{

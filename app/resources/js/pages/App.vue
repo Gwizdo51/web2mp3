@@ -32,8 +32,7 @@ const linkError = ref<string>("");
 const formProcessing = ref<boolean>(false);
 const downloadId = ref<string>("");
 const success = ref<boolean>(true);
-const fileName = ref<string>("proutproutproutproutproutproutproutproutproutproutproutproutproutproutproutproutprout.mp3");
-// const error = ref<string>("ERROR: [generic] Unable to download webpage: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1032) (caused by CertificateVerifyError('[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1032)')); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U ERROR: [generic] Unable to download webpage: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1032) (caused by CertificateVerifyError('[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1032)')); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U");
+const fileName = ref<string>("");
 const error = ref<string>("");
 
 // methods

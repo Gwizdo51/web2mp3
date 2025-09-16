@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 
 class Download extends Model {
@@ -46,7 +47,8 @@ class Download extends Model {
         static::creating(function (Download $download) {
             // Generate a 64-bit timestamp. A simple and effective way is to
             // use a microsecond timestamp, which gives you high precision.
-            $timestamp = Carbon::now()->getTimestampMs();
+            $now = Carbon::now();
+            $timestamp = $now->getTimestampMs();
             // Generate a small, random integer for uniqueness in case of
             // simultaneous requests.
             $random = random_int(0, 99);
@@ -60,6 +62,10 @@ class Download extends Model {
             $base62 = self::toBase62($id);
             // Set the model's ID.
             $download->id = $base62;
+            // set created_at_milliseconds
+            $nowISO = $now->format('Y-m-d H:i:s.v');
+            Log::debug("created_at_milliseconds : {$nowISO}");
+            $download->created_at_milliseconds = $nowISO;
         });
     }
 

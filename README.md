@@ -1,12 +1,13 @@
-# yt2mp3_server
+# Web 2 mp3
 
 A small web project in Laravel + Vue to download songs from YouTube
 
 # TODO
 
-- [ ] Add setup and run steps to README.md (for dev server + behind proxy)
 - [x] Make the website responsive
 - [x] Check for a faster/lighter DB (Redis ? SQLite ?)
+- [ ] Check Redis for queue database
+- [ ] Add setup and run steps to README.md (for dev server + behind proxy)
 
 ## Requirements
 
@@ -111,3 +112,9 @@ Possible states :
 - See details about a table : `.schema <table_name>`
 - Convert timestamp to datetime : `SELECT datetime(available_at, 'unixepoch') FROM jobs;`
 - Dump the WAL into the database : `pragma wal_checkpoint(truncate);`
+
+### Redis CLI
+
+- See all keys : `KEYS *`
+- Get the type of a key : `TYPE web2mp3_database_queues:default:delayed`
+- See all values of a sorted set : `ZRANGEBYSCORE web2mp3_database_queues:default:delayed -inf +inf withscores`

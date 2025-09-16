@@ -2,6 +2,9 @@
 FROM debian:bookworm AS certificate_generator_image
 RUN apt-get update
 RUN apt-get install -y openssl
+# remove apt cache
+# https://askubuntu.com/a/1117923
+RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 VOLUME [ "/mnt" ]
 # ENTRYPOINT [ "/bin/bash" ]
 ENTRYPOINT [ "openssl" ]
@@ -20,8 +23,9 @@ FROM php:8.4-fpm AS app_image
 # https://github.com/mlocati/docker-php-extension-installer
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 # RUN install-php-extensions @composer intl bcmath pdo_mysql zip
-RUN install-php-extensions @composer pdo_pgsql pcntl intl
+RUN install-php-extensions @composer pdo_pgsql pcntl intl redis
 RUN rm /usr/local/bin/install-php-extensions
+# RUN pecl install redis # already installed ?
 # install ca-certificates to enable sending HTTPS requests to the windows server
 # RUN apt-get update
 # RUN apt-get install -y ca-certificates
@@ -36,6 +40,7 @@ FROM app_image AS supervisor_image
 # install supervisor and ffmpeg
 RUN apt-get update
 RUN apt-get install -y supervisor ffmpeg
+RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 # install yt-dlp
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp
 # allow anyone to run yt-dlp
@@ -65,4 +70,5 @@ WORKDIR /var/www
 FROM debian:bookworm AS sqlite_cli_image
 RUN apt-get update
 RUN apt-get install -y sqlite3
+RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 ENTRYPOINT ["sqlite3"]

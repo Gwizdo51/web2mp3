@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('file_name', 255)->nullable();
             $table->string('error', 2048)->nullable();
             $table->foreignId('state_id')->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('job_id')->nullable();
+            $table->timestamp('created_at_milliseconds', 3);
             $table->timestamps();
             $table->softDeletes();
         });

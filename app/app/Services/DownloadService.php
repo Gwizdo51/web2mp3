@@ -37,6 +37,7 @@ class DownloadService {
         Log::debug('$sameDownload :');
         Log::debug($sameDownload);
         if ($sameDownload === null) {
+        // if (true) {
             // save the download parameters in the database
             $download = Download::create([
                 'link' => $link,
@@ -45,13 +46,7 @@ class DownloadService {
                 'state_id' => 1
             ]);
             // start the processing job
-            // https://laracasts.com/discuss/channels/laravel/get-job-id-from-dispatch-in-controller
-            $jobId = Queue::push(new ConvertVideoToAudio($download), queue: 'downloads');
-            Log::debug("processForm - new job ID : {$jobId}");
-            // add the job id to the download model
-            $download->update([
-                'job_id' => $jobId,
-            ]);
+            ConvertVideoToAudio::dispatch($download)->onQueue('downloads');
             // return the new download
             $jsonResponseData = [
                 'id' => $download->id,
@@ -95,20 +90,23 @@ class DownloadService {
 
     public static function getQueuePosition(Download $download): int {
         Log::debug('getQueuePosition - called');
+        Log::debug("getting position of {$download->id}");
         if ($download->state_id >= 2) {
-            return 0;
+            // return 0;
+            $position = 0;
         }
         else {
-            return DB::table('jobs')
-                ->where('queue', 'downloads')
-                ->where('id', '<=', $download->job_id)
-                ->count() - 1;
+            // use the milliseconds precision creation date to count all the downloads that will be processed before this one
+            $position = Download::where('created_at_milliseconds', '<', $download->created_at_milliseconds)
+                ->where('state_id', '<=', 2)
+                ->count();
         }
+        Log::debug("position found : {$position}");
+        return $position;
     }
 
     public static function handleConvertVideoToAudio(Download $download): void {
         Log::debug('handleConvertVideoToAudio - called');
-        Log::debug("handleConvertVideoToAudio - job ID : {$download->job_id}");
         // update the download state
         $download->update([
             'state_id' => 2,
@@ -132,6 +130,7 @@ class DownloadService {
         Log::debug('yt-dlp error output :');
         Log::debug(trim($ytdlpProcessResult->errorOutput()));
         if ($ytdlpProcessResult->successful()) {
+        // if (true) {
             Log::debug('handleConvertVideoToAudio - processing completed successfully');
             // get the name of the file that was created
             $findFileNameProcessResult = Process::run("ls ./storage/app/public/{$download->id}");
