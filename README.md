@@ -6,7 +6,8 @@ A small web project in Laravel + Vue to download songs from YouTube
 
 - [x] Make the website responsive
 - [x] Check for a faster/lighter DB (Redis ? SQLite ?)
-- [ ] Check Redis for queue database
+- [x] Check Redis for queue database
+- [x] Add automatic update of yt-dlp (CRON ?)
 - [ ] Add setup and run steps to README.md (for dev server + behind proxy)
 
 ## Requirements
@@ -19,6 +20,7 @@ Docker
 - Install NPM dependencies
 - Create docker_data folder tree
 - Migrate database
+- Add a `.env` file
 - Generate new app + Reverb keys
 - Add storage link
 - `php artisan optimize`

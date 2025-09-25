@@ -53,11 +53,15 @@ class GenerateReverbCredentials extends Command {
      */
     public function handle() {
         ['id' => $id, 'key' => $key, 'secret' => $secret] = self::generate_reverb_credentials();
-        $this->info('ID :');
-        $this->warn("    {$id}");
-        $this->info('KEY :');
-        $this->warn("    {$key}");
-        $this->info('SECRET :');
-        $this->warn("    {$secret}");
+        // $this->line('ID :');
+        // $this->warn("    {$id}");
+        // $this->line('KEY :');
+        // $this->warn("    {$key}");
+        // $this->line('SECRET :');
+        // $this->warn("    {$secret}");
+        // https://www.yellowduck.be/posts/colors-in-laravel-console-commands
+        $this->line("ID:     <fg=yellow>{$id}</>");
+        $this->line("KEY:    <fg=yellow>{$key}</>");
+        $this->line("SECRET: <fg=yellow>{$secret}</>");
     }
 }

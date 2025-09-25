@@ -4,9 +4,13 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Log;
 
 use App\Events\LinkProcessed;
 
+
+// COMMANDS
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -43,4 +47,28 @@ Artisan::command('inspire', function () {
 //     $this->warn("    {$key}");
 //     $this->info('SECRET :');
 //     $this->warn("    {$secret}");
-// })->purpose('Display a new set of credentials');;
+// })->purpose('Display a new set of credentials');
+
+Artisan::command('update-yt-dlp', function () {
+    Log::debug('CRON - updating yt-dlp');
+    $this->line('CRON - updating <options=bold>yt-dlp</>');
+    $result = Process::run('yt-dlp -U');
+    Log::debug('CRON - standard output :');
+    $this->line('CRON - standard output :');
+    Log::debug(trim($result->output()));
+    $this->info(trim($result->output()));
+    Log::debug('CRON - error output :');
+    $this->line('CRON - error output :');
+    Log::error(trim($result->errorOutput()));
+    $this->error(trim($result->errorOutput()));
+})->purpose('Update the yt-dlp binary');
+
+// SCHEDULED TASKS
+
+Schedule::command('update-yt-dlp')
+    ->dailyAt('04:00'); // UTC time
+    // ->daily();
+
+// Schedule::call(function () {
+//     Log::debug("called with schedule:work");
+// })->everyMinute();
