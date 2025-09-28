@@ -104,6 +104,9 @@ services:
     build:
       context: "../"
       target: "supervisor_image"
+      args:
+        UID: "1000"
+        GID: "1000"
     image: "web2mp3/jobs"
     volumes:
     - "../queue_worker.conf:/etc/supervisor/conf.d/queue_worker.conf:ro"

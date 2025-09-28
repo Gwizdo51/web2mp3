@@ -37,14 +37,20 @@ WORKDIR /var/www
 
 # queue workers + yt-dlp image
 FROM app_image AS supervisor_image
+ARG UID=1000
+ARG GID=1000
 # install supervisor and ffmpeg
 RUN apt-get update
 RUN apt-get install -y supervisor ffmpeg
 RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
-# install yt-dlp
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/bin/yt-dlp
+# install yt-dlp in a user owned "my_bin" directory
+RUN mkdir /usr/local/my_bin
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o /usr/local/my_bin/yt-dlp
+RUN chown -R ${UID}:${GID} /usr/local/my_bin
 # allow anyone to run yt-dlp
-RUN chmod a+x /usr/local/bin/yt-dlp
+RUN chmod a+x /usr/local/my_bin/yt-dlp
+# add "my_bin" to the PATH
+ENV PATH="/usr/local/my_bin:${PATH}"
 # run supervisor in the foreground
 CMD ["supervisord", "-nc", "/etc/supervisor/conf.d/queue_worker.conf"]
 

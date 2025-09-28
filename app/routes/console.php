@@ -50,15 +50,15 @@ Artisan::command('inspire', function () {
 // })->purpose('Display a new set of credentials');
 
 Artisan::command('update-yt-dlp', function () {
-    Log::debug('CRON - updating yt-dlp');
-    $this->line('CRON - updating <options=bold>yt-dlp</>');
+    Log::debug('update-yt-dlp - updating yt-dlp');
+    $this->line('update-yt-dlp - updating <options=bold>yt-dlp</>');
     $result = Process::run('yt-dlp -U');
-    Log::debug('CRON - standard output :');
-    $this->line('CRON - standard output :');
+    Log::debug('update-yt-dlp - standard output :');
+    $this->line('update-yt-dlp - standard output :');
     Log::debug(trim($result->output()));
     $this->info(trim($result->output()));
-    Log::debug('CRON - error output :');
-    $this->line('CRON - error output :');
+    Log::debug('update-yt-dlp - error output :');
+    $this->line('update-yt-dlp - error output :');
     Log::error(trim($result->errorOutput()));
     $this->error(trim($result->errorOutput()));
 })->purpose('Update the yt-dlp binary');

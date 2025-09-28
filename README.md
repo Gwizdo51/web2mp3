@@ -117,6 +117,8 @@ Possible states :
 
 ### Redis CLI
 
+To access the cli: `redis-cli`
+
 - See all keys : `KEYS *`
 - Get the type of a key : `TYPE web2mp3_database_queues:default:delayed`
 - See all values of a sorted set : `ZRANGEBYSCORE web2mp3_database_queues:default:delayed -inf +inf withscores`
