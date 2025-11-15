@@ -37,7 +37,7 @@ services:
   #   - "3306:3306"
   #   # run as the user that cloned the repository (replace if necessary)
   #   user: "1000:1000"
-  #   restart: unless-stopped
+  #   restart: "unless-stopped"
 
   # web2mp3_database:
   #   container_name: "web2mp3_server_database"
@@ -61,7 +61,7 @@ services:
   #   - "5432:5432"
   #   user: "1000:1000"
   #   # entrypoint: "bash"
-  #   # restart: unless-stopped
+  #   # restart: "unless-stopped"
 
   # contains the PHP-FPM processor
   web2mp3_app:
@@ -85,7 +85,7 @@ services:
     # - "/home/arthur/code/docker_data/yt2mp3/certs/self.crt:/mnt/self.pem:ro"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
-    # restart: unless-stopped
+    restart: "unless-stopped"
     # entrypoint: "bash"
     # ports:
     # - "8000:8000"
@@ -113,7 +113,7 @@ services:
     - "../../app:/var/www"
     - "/srv/docker_data/web2mp3/storage:/var/www/storage/app/public"
     - "/srv/docker_data/web2mp3/sqlite:/var/www/sqlite"
-    - "/srv/docker_data/certs/self.crt:/mnt/self.crt:ro"
+    - "/srv/docker_data/certs/self.crt:/mnt/self.crt:ro" # necessary for broadcasting websocket events
     depends_on:
     #   web2mp3_database:
     #     condition: "service_healthy"
@@ -125,7 +125,7 @@ services:
       WORKER_MODE: "work"
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
-    # restart: unless-stopped
+    restart: "unless-stopped"
     # entrypoint: "bash"
 
   web2mp3_reverb:
@@ -152,6 +152,7 @@ services:
     - "artisan"
     - "reverb:start"
     # - "--debug"
+    restart: "unless-stopped"
 
   web2mp3_redis:
     container_name: "web2mp3_server_redis"
@@ -170,6 +171,7 @@ services:
     - "--save 60 1"
     - "--appendonly yes"
     - "--appendfsync everysec"
+    restart: "unless-stopped"
 
   # used to run "npm run dev" to watch for changes in files
   web2mp3_node:
@@ -187,6 +189,7 @@ services:
     # run as the user that cloned the repository (replace if necessary)
     user: "1000:1000"
     ### DEV ###
+    # restart: "unless-stopped"
     # command:
     # - "npm"
     # - "run"
@@ -200,7 +203,6 @@ services:
     - "-c"
     - "rm -f /app/public/hot && npm run build"
     ### END PROD ###
-    # restart: unless-stopped
 
   # contains the NGINX web server
   web2mp3_nginx:
@@ -224,5 +226,5 @@ services:
     # - "80:80"
     # - "443:443"
     # - "5000:5000"
-    # restart: unless-stopped
+    restart: "unless-stopped"
     # entrypoint: "bash"
