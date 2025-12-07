@@ -158,7 +158,7 @@ services:
     container_name: "web2mp3_server_redis"
     networks:
     - "net"
-    image: "redis:8.2.1-bookworm"
+    image: "redis:8.4.0-bookworm"
     volumes:
     - "/srv/docker_data/web2mp3/redis:/data"
     healthcheck:
@@ -178,7 +178,7 @@ services:
     container_name: "web2mp3_server_node"
     networks:
     - "net"
-    image: "node:24.4.0"
+    image: "node:25"
     # depends_on:
     # - "app"
     # - "jobs"

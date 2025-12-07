@@ -51,6 +51,8 @@ RUN chown -R ${UID}:${GID} /usr/local/my_bin
 RUN chmod a+x /usr/local/my_bin/yt-dlp
 # add "my_bin" to the PATH
 ENV PATH="/usr/local/my_bin:${PATH}"
+# add Deno JS runtime (yt-dlp requirement)
+COPY --link --from=denoland/deno:bin-2.5.6 /deno /usr/local/bin/deno
 # run supervisor in the foreground
 CMD ["supervisord", "-nc", "/etc/supervisor/conf.d/queue_worker.conf"]
 
